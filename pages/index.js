@@ -4,14 +4,16 @@ export default function Home() {
   const [canSpin, setCanSpin] = useState(true);
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
+  
+  // Призи та їх відсотки
   const prizes = [
-    'VIP premium на 2 тижня',
-    'VIP premium на 1 тиждень',
-    'VIP premium на 3 дні',
-    'VIP free на 3 тижня',
-    'Prefix на 7 днів',
-    'Medic на 4 дні',
-  ];
+    { name: 'VIP premium на 2 тижня', percentage: 10 },
+    { name: 'VIP premium на 1 тиждень', percentage: 10 },
+    { name: 'VIP premium на 3 дні', percentage: 10 },
+    { name: 'VIP free на 3 тижня', percentage: 12 },
+    { name: 'Prefix на 7 днів', percentage: 12 },
+    { name: 'Medic на 4 дні', percentage: 12 },
+    { name: 'Повезе у наступний раз', percentage: 13 },
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
@@ -26,12 +28,26 @@ export default function Home() {
     }
   }, []);
 
+  // Функція для вибору призу з урахуванням відсотків
+  const getPrize = () => {
+    const random = Math.random() * 100; // Випадкове число від 0 до 100
+    let cumulativePercentage = 0;
+
+    for (const prize of prizes) {
+      cumulativePercentage += prize.percentage;
+      if (random <= cumulativePercentage) {
+        return prize.name;
+      }
+    }
+
+    return prizes[0].name; // Якщо раптом жоден приз не був вибраний, повертаємо перший
+  };
+
   const spinWheel = () => {
     if (!canSpin) return;
 
     const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
-    const prizeIndex = Math.floor(((rotation % 360) / 60) % prizes.length);
-    const wonPrize = prizes[prizeIndex];
+    const wonPrize = getPrize(); // Отримуємо приз з урахуванням відсотків
 
     // Збереження обертання
     const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
@@ -72,7 +88,7 @@ export default function Home() {
               transform: `rotate(${index * 60}deg)`,
             }}
           >
-            {prize}
+            {prize.name}
           </div>
         ))}
       </div>
