@@ -89,20 +89,6 @@ export default function Home() {
           backgroundColor: '#fff', // Білий фон всередині колеса
         }}
       >
-        {/* Центр колеса (білий) */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '60%',
-            height: '60%',
-            backgroundColor: '#fff',
-            borderRadius: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        />
-
         {/* Сектора колеса */}
         {prizes.map((prize, index) => (
           <div
@@ -152,4 +138,29 @@ export default function Home() {
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
 
-      <div id="availablePrizes" style={{
+      <div id="availablePrizes" style={{ marginTop: '30px', textAlign: 'left', paddingLeft: '20px' }}>
+        <h3>Доступні призи</h3>
+        <ul style={{ padding: '0' }}>
+          {prizes.map((prize, index) => (
+            <li key={index} style={{ fontSize: '18px', marginBottom: '8px' }}>
+              <strong>{prize.name}</strong>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Історія призів</h3>
+        {history.length === 0 ? (
+          <p>Поки що обертання відсутні.</p>
+        ) : (
+          history.map((spin, index) => (
+            <p key={index}>
+              {index + 1}. {spin.date} - {spin.prize}
+            </p>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
