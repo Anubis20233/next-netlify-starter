@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Home() {
   const [canSpin, setCanSpin] = useState(true);
@@ -53,6 +53,7 @@ export default function Home() {
   const spinWheel = () => {
     if (!canSpin) return;
 
+    // Обчислення випадкового кута для обертання колеса
     const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
     const wonPrize = getPrize(); // Отримуємо приз з урахуванням відсотків
 
@@ -73,6 +74,8 @@ export default function Home() {
   return (
     <div style={{ textAlign: 'center', margin: '30px' }}>
       <h1>Крутимо Колесо Фортуни!</h1>
+      
+      {/* Колесо фортуни */}
       <div
         id="wheel"
         style={{
@@ -85,7 +88,7 @@ export default function Home() {
           margin: '0 auto',
         }}
       >
-        {/* Кільце колеса */}
+        {/* Сектора колеса */}
         {prizes.map((prize, index) => (
           <div
             key={index}
@@ -98,7 +101,7 @@ export default function Home() {
               backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`,
               transformOrigin: '0% 0%',
               transform: `rotate(${(360 / prizes.length) * index}deg)`,
-              textAlign: 'right',
+              textAlign: 'center',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -160,4 +163,3 @@ export default function Home() {
     </div>
   );
 }
-
