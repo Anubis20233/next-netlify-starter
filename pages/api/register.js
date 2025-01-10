@@ -131,7 +131,7 @@ export default function Home() {
         <ul style={{ padding: '0' }}>
           {prizes.map((prize, index) => (
             <li key={index} style={{ fontSize: '18px', marginBottom: '8px' }}>
-              <strong>{prize.name}</strong> - Шанс: {prize.percentage}%
+              <strong>{prize.name}</strong>
             </li>
           ))}
         </ul>
@@ -152,3 +152,4 @@ export default function Home() {
     </div>
   );
 }
+
