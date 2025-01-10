@@ -101,10 +101,12 @@ export default function Home() {
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontSize: '12px', // Менший шрифт для призів, щоб вони вмістились
+              fontSize: '14px', // Збільшено шрифт
+              fontWeight: 'bold',
               padding: '5px',
               textAlign: 'center',
               overflow: 'hidden', // щоб текст не вилазив за межі
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)', // Тінь для кращої видимості
             }}
           >
             {prize.name}
