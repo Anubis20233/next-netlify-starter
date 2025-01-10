@@ -4,23 +4,24 @@ export default function Home() {
   const [canSpin, setCanSpin] = useState(true);
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
-  
-  // Призи та їх відсотки
+  const [timer, setTimer] = useState(0); // Додамо стейт для таймера
+
+  // Призи без відсотків
   const prizes = [
-    { name: 'VIP premium на 2 тижня', percentage: 10 },
-    { name: 'VIP premium на 1 тиждень', percentage: 10 },
-    { name: 'VIP premium на 3 дні', percentage: 10 },
-    { name: 'VIP free на 3 тижня', percentage: 12 },
-    { name: 'Prefix на 7 днів', percentage: 12 },
-    { name: 'Medic на 4 дні', percentage: 11 },
-    { name: 'Повезе у наступний раз', percentage: 13 },
-    { name: 'VIP Fri на 3 тижня', percentage: 13 },
-    { name: 'VIP fri на 2 тижня ', percentage: 13 },
-    { name: 'VIP fri на 1 тиждень', percentage: 13 },
-    { name: 'VIP fri на 5 днів ', percentage: 13 },
-    { name: 'VIP Fri на 3 дні ', percentage: 13 },
-    { name: 'Імунітет на AWP на 3 дні ', percentage: 11 },
-    ];
+    'VIP premium на 2 тижня',
+    'VIP premium на 1 тиждень',
+    'VIP premium на 3 дні',
+    'VIP free на 3 тижня',
+    'Prefix на 7 днів',
+    'Medic на 4 дні',
+    'Повезе у наступний раз',
+    'VIP Fri на 3 тижня',
+    'VIP fri на 2 тижня',
+    'VIP fri на 1 тиждень',
+    'VIP fri на 5 днів',
+    'VIP Fri на 3 дні',
+    'Імунітет на AWP на 3 дні',
+  ];
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
@@ -32,29 +33,36 @@ export default function Home() {
       const now = new Date();
       const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
       setCanSpin(now - lastSpin >= oneWeek);
+      
+      // Якщо не можна крутити, додаємо таймер
+      if (now - lastSpin < oneWeek) {
+        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000); // Час до відновлення обертання
+        setTimer(countdown);
+        const timerInterval = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(timerInterval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000); // Оновлення кожну секунду
+        return () => clearInterval(timerInterval); // Очищуємо інтервал при скасуванні компонента
+      }
     }
   }, []);
 
-  // Функція для вибору призу з урахуванням відсотків
+  // Функція для вибору призу
   const getPrize = () => {
-    const random = Math.random() * 100; // Випадкове число від 0 до 100
-    let cumulativePercentage = 0;
-
-    for (const prize of prizes) {
-      cumulativePercentage += prize.percentage;
-      if (random <= cumulativePercentage) {
-        return prize.name;
-      }
-    }
-
-    return prizes[0].name; // Якщо раптом жоден приз не був вибраний, повертаємо перший
+    const randomIndex = Math.floor(Math.random() * prizes.length); // Випадковий індекс
+    return prizes[randomIndex]; // Повертаємо приз
   };
 
   const spinWheel = () => {
     if (!canSpin) return;
 
     const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
-    const wonPrize = getPrize(); // Отримуємо приз з урахуванням відсотків
+    const wonPrize = getPrize(); // Отримуємо приз
 
     // Збереження обертання
     const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
@@ -95,7 +103,7 @@ export default function Home() {
               transform: `rotate(${index * 60}deg)`,
             }}
           >
-            {prize.name}
+            {prize}
           </div>
         ))}
       </div>
@@ -108,7 +116,7 @@ export default function Home() {
         {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
       </button>
       <p id="message" style={{ marginTop: '10px', color: 'red' }}>
-        {!canSpin ? 'Наступне обертання буде доступне через 7 днів.' : ''}
+        {!canSpin ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.` : ''}
       </p>
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
         {prize ? `Ви виграли: ${prize}` : ''}
