@@ -1,170 +1,107 @@
-import React, { useState, useEffect } from 'react';
+// JS
+const prizes = [
+  { text: "3%", color: "#e32433" },
+  { text: "Чайник", color: "#fff", cls: "white small" },
+  { text: "5%", color: "#3291cb" },
+  { text: "Ваги", color: "#ff6600", cls: "small" },
+  { text: "10%", color: "#91c534" },
+  { text: "Флешка", color: "#ffa800", cls: "small" },
+  { text: "15%", color: "#e32433" },
+  { text: "3%", color: "#464344" },
+  { text: "25%", color: "#3090cc" },
+  { text: "3%", color: "#ffa800" },
+  { text: "Сковорідка", color: "#91c534", cls: "small" },
+  { text: "5%", color: "#ffa800" },
+];
 
-export default function Home() {
-  const [canSpin, setCanSpin] = useState(true);
-  const [prize, setPrize] = useState('');
-  const [history, setHistory] = useState([]);
+const wheel = document.querySelector(".deal-wheel");
+const spinner = wheel.querySelector(".spinner");
+const trigger = wheel.querySelector(".btn-spin");
+const ticker = wheel.querySelector(".ticker");
 
-  // Призи та їх відсотки
-  const prizes = [
-    { name: 'VIP premium на 2 тижня' },
-    { name: 'VIP premium на 1 тиждень' },
-    { name: 'VIP premium на 3 дні' },
-    { name: 'VIP free на 3 тижня' },
-    { name: 'Prefix на 7 днів' },
-    { name: 'Medic на 4 дні' },
-    { name: 'Повезе у наступний раз' },
-    { name: 'VIP Fri на 3 тижня' },
-    { name: 'VIP fri на 2 тижня' },
-    { name: 'VIP fri на 1 тиждень' },
-    { name: 'VIP fri на 5 днів' },
-    { name: 'VIP Fri на 3 дні' },
-    { name: 'Імунітет на AWP на 3 дні' },
-  ];
+const prizeSlice = 360 / prizes.length;
+const prizeOffset = Math.floor(180 / prizes.length);
 
-  useEffect(() => {
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];
-    setHistory(spinHistory);
+let rotation = 0;
+let currentSlice = 0;
+let prizeNodes;
 
-    if (lastSpinDate) {
-      const lastSpin = new Date(lastSpinDate);
-      const now = new Date();
-      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
-      setCanSpin(now - lastSpin >= oneWeek);
-    }
-  }, []);
+const createPrizeNodes = () => {
+  prizes.forEach(({ text, color, cls }, i) => {
+    const rotation = ((prizeSlice * i) * -1) - prizeOffset;
+    spinner.insertAdjacentHTML(
+      "beforeend",
+      `<li class="prize ${cls}" data-reaction="" style="--rotate: ${rotation}deg">
+        <span class="text">${text}</span>
+      </li>`
+    );
+  });
+};
 
-  // Функція для вибору призу з урахуванням відсотків
-  const getPrize = () => {
-    const random = Math.random() * 100; // Випадкове число від 0 до 100
-    let cumulativePercentage = 0;
-
-    for (const prize of prizes) {
-      cumulativePercentage += 100 / prizes.length; // Простий розподіл між усіма призами
-      if (random <= cumulativePercentage) {
-        return prize.name;
+const createConicGradient = () => {
+  spinner.setAttribute(
+    "style",
+    `background: conic-gradient(
+      from -90deg,
+      ${prizes
+        .map(({ color }, i) => `${color} 0 ${(100 / prizes.length) * (prizes.length - i)}%`)
+        .reverse()
       }
-    }
-
-    return prizes[0].name; // Якщо раптом жоден приз не був вибраний, повертаємо перший
-  };
-
-  const spinWheel = () => {
-    if (!canSpin) return;
-
-    // Обчислення випадкового кута для обертання колеса
-    const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
-    const wonPrize = getPrize(); // Отримуємо приз з урахуванням відсотків
-
-    // Збереження обертання
-    const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
-    setHistory(newHistory);
-    localStorage.setItem('spinHistory', JSON.stringify(newHistory));
-    localStorage.setItem('lastSpinDate', new Date().toISOString());
-    setPrize(wonPrize);
-    setCanSpin(false);
-
-    // Застосування обертання до колеса
-    const wheel = document.getElementById("wheel");
-    wheel.style.transition = "transform 4s ease-out";  // Додаємо плавність
-    wheel.style.transform = `rotate(${rotation}deg)`;
-  };
-
-  return (
-    <div style={{ textAlign: 'center', margin: '30px' }}>
-      <h1>Крутимо Колесо Фортуни!</h1>
-      
-      {/* Колесо фортуни */}
-      <div
-        id="wheel"
-        style={{
-          width: '350px',
-          height: '350px',
-          border: '10px solid #4CAF50', // Зелена рамка навколо колеса
-          borderRadius: '50%',
-          position: 'relative',
-          overflow: 'hidden',
-          margin: '0 auto',
-          backgroundColor: '#fff', // Білий фон всередині колеса
-        }}
-      >
-        {/* Сектора колеса */}
-        {prizes.map((prize, index) => {
-          const angle = (360 / prizes.length) * index;
-          return (
-            <div
-              key={index}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: '50%',
-                height: '50%',
-                backgroundColor: `hsl(${(360 / prizes.length) * index}, 70%, 60%)`, // Кольори секторів
-                transformOrigin: '100% 100%',
-                transform: `rotate(${angle}deg)`,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: '#fff',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                padding: '10px',
-                clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
-                textAlign: 'center',
-                lineHeight: '1.5', // Вирівнювання тексту
-              }}
-            >
-              {prize.name}
-            </div>
-          );
-        })}
-      </div>
-
-      <button
-        id="spinButton"
-        onClick={spinWheel}
-        disabled={!canSpin}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          fontSize: '16px',
-          cursor: 'pointer',
-        }}
-      >
-        {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
-      </button>
-      <p id="message" style={{ marginTop: '10px', color: 'red' }}>
-        {!canSpin ? 'Наступне обертання буде доступне через 7 днів.' : ''}
-      </p>
-      <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
-        {prize ? `Ви виграли: ${prize}` : ''}
-      </p>
-
-      <div id="availablePrizes" style={{ marginTop: '30px', textAlign: 'left', paddingLeft: '20px' }}>
-        <h3>Доступні призи</h3>
-        <ul style={{ padding: '0' }}>
-          {prizes.map((prize, index) => (
-            <li key={index} style={{ fontSize: '18px', marginBottom: '8px' }}>
-              <strong>{prize.name}</strong>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
-        <h3>Історія призів</h3>
-        {history.length === 0 ? (
-          <p>Поки що обертання відсутні.</p>
-        ) : (
-          history.map((spin, index) => (
-            <p key={index}>
-              {index + 1}. {spin.date} - {spin.prize}
-            </p>
-          ))
-        )}
-      </div>
-    </div>
+    );`
   );
-}
+};
+
+const setupWheel = () => {
+  createConicGradient();
+  createPrizeNodes();
+  prizeNodes = wheel.querySelectorAll(".prize");
+};
+
+const runTickerAnimation = () => {
+  const values = window.getComputedStyle(spinner).transform.split("(")[1].split(")")[0].split(",");
+  const a = values[0];
+  const b = values[1];
+  let radrad = Math.atan2(b, a);
+  if (radrad < 0) radrad += (2 * Math.PI);
+  const angle = Math.round(radrad * (180 / Math.PI));
+  const slice = Math.floor(angle / prizeSlice);
+
+  if (currentSlice !== slice) {
+    ticker.style.animation = "none";
+    setTimeout(() => ticker.style.animation = null, 10);
+    currentSlice = slice;
+  }
+
+  requestAnimationFrame(runTickerAnimation);
+};
+
+const selectPrize = () => {
+  const selected = Math.floor(rotation / prizeSlice);
+  prizeNodes[selected].classList.add("selected");
+  console.info(prizes[selected]);
+  console.info(prizeNodes[selected].querySelector(".text").innerText);
+};
+
+trigger.addEventListener("click", () => {
+  trigger.disabled = true;
+  rotation = Math.floor(Math.random() * 360 + Math.random() * 4000);
+  rotation = 360 * 2 + Math.floor(Math.random() * 30 + 28);
+
+  prizeNodes.forEach((prize) => prize.classList.remove("selected"));
+  wheel.classList.add("is-spinning");
+  spinner.style.setProperty("--rotate", rotation);
+  ticker.style.animation = "none";
+  runTickerAnimation();
+});
+
+spinner.addEventListener("transitionend", () => {
+  cancelAnimationFrame();
+  rotation %= 360;
+  selectPrize();
+  wheel.classList.remove("is-spinning");
+  spinner.style.setProperty("--rotate", rotation);
+  trigger.disabled = false;
+});
+
+setupWheel();
+
