@@ -97,6 +97,14 @@ export default function Home() {
               border: '1px solid #fff',
               clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
               transform: `rotate(${index * 60}deg)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '12px', // Менший шрифт для призів, щоб вони вмістились
+              padding: '5px',
+              textAlign: 'center',
+              overflow: 'hidden', // щоб текст не вилазив за межі
             }}
           >
             {prize.name}
