@@ -75,8 +75,8 @@ export default function Home() {
       <div
         id="wheel"
         style={{
-          width: '300px',
-          height: '300px',
+          width: '350px',
+          height: '350px',
           border: '10px solid #4CAF50',
           borderRadius: '50%',
           display: 'flex',
@@ -84,6 +84,7 @@ export default function Home() {
           justifyContent: 'center',
           position: 'relative',
           transition: 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)',
+          overflow: 'hidden',
         }}
       >
         {prizes.map((prize, index) => (
@@ -93,20 +94,19 @@ export default function Home() {
               position: 'absolute',
               width: '50%',
               height: '50%',
-              backgroundColor: '#f39c12',
-              border: '1px solid #fff',
+              backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`, // Використовуємо кольори, які змінюються
               clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
-              transform: `rotate(${index * 60}deg)`,
+              transform: `rotate(${(index * 360) / prizes.length}deg)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
-              fontSize: '14px', // Збільшено шрифт
+              color: '#fff',
+              fontSize: '14px', // Менший шрифт
               fontWeight: 'bold',
-              padding: '5px',
+              padding: '10px',
               textAlign: 'center',
-              overflow: 'hidden', // щоб текст не вилазив за межі
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)', // Тінь для кращої видимості
+              overflow: 'hidden',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)', // Тінь для тексту
             }}
           >
             {prize.name}
@@ -117,7 +117,12 @@ export default function Home() {
         id="spinButton"
         onClick={spinWheel}
         disabled={!canSpin}
-        style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          fontSize: '16px',
+          cursor: 'pointer',
+        }}
       >
         {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
       </button>
