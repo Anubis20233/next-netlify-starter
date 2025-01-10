@@ -1,34 +1,40 @@
-.wheel {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  border: 1px solid black;
-  overflow: hidden;
+function promiseAfterTimeout(seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(() => resolve(), seconds*1000);
+  });
+}
+
+function rotateWheel(degr) {
+  let wheel = document.querySelector('.wheel');
+  wheel.style.transform = 'rotate('+degr+'deg)';
+  return promiseAfterTimeout(3);
+}
+
+function randomDegrees() {
+  let randomFloat = Math.random()*360;
+  let descreetDegrees = Math.round(randomFloat / 60) * 60;
+  return descreetDegrees;
+}
+
+function getCurrentColor(currentDegrees) {
+  let colors = ["green", "red", "orange", "cyan", "yellow", "blue"];
+  let segmentCount = parseInt(currentDegrees/60);
+  let segmentShift = segmentCount % colors.length;
   
-  background-image: conic-gradient(red 16.67%, green 0 33.33%, blue 0 50%, yellow 0 66.67%, cyan 0 83.33%, orange 0);
+  return colors[segmentShift];
 }
 
-.arrow {
-  background-color: black;
-  width: 10px;
-  height: 10px;
-  position: absolute;
-  left: 225px;
-  top: 100px;
+function launchSpin() {
+  currentRotation += randomDegrees();
+  
+  rotateWheel(currentRotation)
+    .then(() => {
+      let winColor = getCurrentColor(currentRotation);
+      let result = document.querySelector('.result');
+      result.style.backgroundColor = winColor;
+    });
 }
 
-.spin {
-  margin-top: 20px;
-}
-
-.result {
-  margin-top: 10px;
-  width: 20px;
-  height: 20px;
-  border: 1px solid black;
-}
-
-.rotating {
-  transition: all 3s;
-  transition-timing: ease-in-out;
-}
+let currentRotation = 0;
+let spinButton = document.querySelector('.spin');
+spinButton.addEventListener('click', launchSpin);
