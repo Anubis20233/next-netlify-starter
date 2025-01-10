@@ -20,6 +20,7 @@ export default function Home() {
     { name: 'VIP fri на 5 днів ', percentage: 13 },
     { name: 'VIP Fri на 3 дні ', percentage: 13 },
     { name: 'Імунітет на AWP на 3 дні ', percentage: 11 },
+    ];
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
