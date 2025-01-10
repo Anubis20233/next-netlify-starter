@@ -12,8 +12,14 @@ export default function Home() {
     { name: 'VIP premium на 3 дні', percentage: 10 },
     { name: 'VIP free на 3 тижня', percentage: 12 },
     { name: 'Prefix на 7 днів', percentage: 12 },
-    { name: 'Medic на 4 дні', percentage: 12 },
+    { name: 'Medic на 4 дні', percentage: 11 },
     { name: 'Повезе у наступний раз', percentage: 13 },
+    { name: 'VIP Fri на 3 тижня', percentage: 13 },
+    { name: 'VIP fri на 2 тижня ', percentage: 13 },
+    { name: 'VIP fri на 1 тиждень', percentage: 13 },
+    { name: 'VIP fri на 5 днів ', percentage: 13 },
+    { name: 'VIP Fri на 3 дні ', percentage: 13 },
+    { name: 'Імунітет на AWP на 3 дні ', percentage: 11 },
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
