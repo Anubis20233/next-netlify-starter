@@ -87,31 +87,42 @@ export default function Home() {
           overflow: 'hidden',
         }}
       >
-        {prizes.map((prize, index) => (
-          <div
-            key={index}
-            style={{
-              position: 'absolute',
-              width: '50%',
-              height: '50%',
-              backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`, // Використовуємо кольори, які змінюються
-              clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
-              transform: `rotate(${(index * 360) / prizes.length}deg)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '14px', // Менший шрифт
-              fontWeight: 'bold',
-              padding: '10px',
-              textAlign: 'center',
-              overflow: 'hidden',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)', // Тінь для тексту
-            }}
-          >
-            {prize.name}
-          </div>
-        ))}
+        <div
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            transform: 'rotate(0deg)',
+          }}
+        >
+          {prizes.map((prize, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                top: `${(index * 100) / prizes.length}%`,
+                width: '100%',
+                height: `${100 / prizes.length}%`,
+                backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`,
+                textAlign: 'center',
+                color: '#fff',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                lineHeight: '3',  // Центруємо текст вертикально
+                padding: '10px 0',
+                transform: `rotate(${(360 / prizes.length) * index}deg)`,
+              }}
+            >
+              {prize.name}
+            </div>
+          ))}
+        </div>
       </div>
       <button
         id="spinButton"
