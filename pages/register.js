@@ -118,12 +118,12 @@ export default function Home() {
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
 
-      <div id="availablePrizes" style={{ marginTop: '30px', textAlign: 'left' }}>
+      <div id="availablePrizes" style={{ marginTop: '30px', textAlign: 'left', paddingLeft: '20px' }}>
         <h3>Доступні призи</h3>
-        <ul>
+        <ul style={{ padding: '0' }}>
           {prizes.map((prize, index) => (
-            <li key={index} style={{ listStyleType: 'none', fontSize: '18px' }}>
-              {prize.name} (Шанс: {prize.percentage}%)
+            <li key={index} style={{ fontSize: '18px', marginBottom: '8px' }}>
+              <strong>{prize.name}</strong> - Шанс: {prize.percentage}%
             </li>
           ))}
         </ul>
@@ -144,3 +144,4 @@ export default function Home() {
     </div>
   );
 }
+
