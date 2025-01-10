@@ -117,6 +117,18 @@ export default function Home() {
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
+
+      <div id="availablePrizes" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Доступні призи</h3>
+        <ul>
+          {prizes.map((prize, index) => (
+            <li key={index} style={{ listStyleType: 'none', fontSize: '18px' }}>
+              {prize.name} (Шанс: {prize.percentage}%)
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
         <h3>Історія призів</h3>
         {history.length === 0 ? (
