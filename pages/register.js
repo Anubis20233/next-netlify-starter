@@ -99,9 +99,8 @@ export default function Home() {
               width: '50%',
               height: '50%',
               backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`,
-              transformOrigin: '0% 0%',
+              transformOrigin: '100% 100%',
               transform: `rotate(${(360 / prizes.length) * index}deg)`,
-              textAlign: 'center',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -110,6 +109,7 @@ export default function Home() {
               fontSize: '14px',
               padding: '10px',
               clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+              textAlign: 'center',
             }}
           >
             {prize.name}
