@@ -1,217 +1,138 @@
-/* Шрифти */
-@font-face {
-  font-family: "Bebas";
-  src: url('../fonts/Bebas.ttf');
-}
+import { useState, useEffect } from 'react';
 
-/* Загальні налаштування для усіх елементів */
-* {
-  box-sizing: border-box;
-}
+export default function Home() {
+  const [canSpin, setCanSpin] = useState(true);
+  const [prize, setPrize] = useState('');
+  const [history, setHistory] = useState([]);
+  const [timer, setTimer] = useState(0); // Додамо стейт для таймера
 
-/* Основні налаштування для сторінки */
-.body-deal-wheel {
-  display: grid; /* Використовуємо сітку для центрування */
-  place-items: center;
-  overflow: hidden; /* Сховуємо все, що виходить за межі */
-  font-family: 'Bebas', sans-serif; /* Підключаємо шрифт */
-}
+  // Призи без відсотків
+  const prizes = [
+    'VIP premium на 2 тижня',
+    'VIP premium на 1 тиждень',
+    'VIP premium на 3 дні',
+    'VIP free на 3 тижня',
+    'Prefix на 7 днів',
+    'Medic на 4 дні',
+    'Повезе у наступний раз',
+    'VIP Fri на 3 тижня',
+    'VIP fri на 2 тижня',
+    'VIP fri на 1 тиждень',
+    'VIP fri на 5 днів',
+    'VIP Fri на 3 дні',
+    'Імунітет на AWP на 3 дні',
+  ];
 
-/* Основний блок колеса */
-.deal-wheel {
-  --size: clamp(250px, 80vmin, 700px); /* Адаптивний розмір колеса */
-  --lg-hs: 0 3%;
-  --lg-stop: 50%;
-  --lg: linear-gradient(
-    hsl(var(--lg-hs) 0%) 0 var(--lg-stop),
-    hsl(var(--lg-hs) 20%) var(--lg-stop) 100%
+  useEffect(() => {
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    const spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];
+    setHistory(spinHistory);
+
+    if (lastSpinDate) {
+      const lastSpin = new Date(lastSpinDate);
+      const now = new Date();
+      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+      setCanSpin(now - lastSpin >= oneWeek);
+      
+      // Якщо не можна крутити, додаємо таймер
+      if (now - lastSpin < oneWeek) {
+        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000); // Час до відновлення обертання
+        setTimer(countdown);
+        const timerInterval = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(timerInterval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000); // Оновлення кожну секунду
+        return () => clearInterval(timerInterval); // Очищуємо інтервал при скасуванні компонента
+      }
+    }
+  }, []);
+
+  // Функція для вибору призу
+  const getPrize = () => {
+    const randomIndex = Math.floor(Math.random() * prizes.length); // Випадковий індекс
+    return prizes[randomIndex]; // Повертаємо приз
+  };
+
+  const spinWheel = () => {
+    if (!canSpin) return;
+
+    const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
+    const wonPrize = getPrize(); // Отримуємо приз
+
+    // Збереження обертання
+    const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
+    setHistory(newHistory);
+    localStorage.setItem('spinHistory', JSON.stringify(newHistory));
+    localStorage.setItem('lastSpinDate', new Date().toISOString());
+    setPrize(wonPrize);
+    setCanSpin(false);
+  };
+
+  return (
+    <div style={{ textAlign: 'center', margin: '30px' }}>
+      <h1>Крутимо Колесо Фортуни!</h1>
+      <div
+        id="wheel"
+        style={{
+          width: '300px',
+          height: '300px',
+          border: '10px solid #4CAF50',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          transition: 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)',
+        }}
+      >
+        {prizes.map((prize, index) => (
+          <div
+            key={index}
+            style={{
+              position: 'absolute',
+              width: '50%',
+              height: '50%',
+              backgroundColor: '#f39c12',
+              border: '1px solid #fff',
+              clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+              transform: `rotate(${index * 60}deg)`,
+            }}
+          >
+            {prize}
+          </div>
+        ))}
+      </div>
+      <button
+        id="spinButton"
+        onClick={spinWheel}
+        disabled={!canSpin}
+        style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+      >
+        {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
+      </button>
+      <p id="message" style={{ marginTop: '10px', color: 'red' }}>
+        {!canSpin ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.` : ''}
+      </p>
+      <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
+        {prize ? `Ви виграли: ${prize}` : ''}
+      </p>
+      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Історія призів</h3>
+        {history.length === 0 ? (
+          <p>Поки що обертання відсутні.</p>
+        ) : (
+          history.map((spin, index) => (
+            <p key={index}>
+              {index + 1}. {spin.date} - {spin.prize}
+            </p>
+          ))
+        )}
+      </div>
+    </div>
   );
-  position: relative;
-  display: grid;
-  grid-gap: calc(var(--size) / 20); /* Відстань між елементами */
-  align-items: center;
-  grid-template-areas: "spinner" "trigger"; /* Для елементів всередині */
-  font-size: calc(var(--size) / 21); /* Розмір шрифта адаптується до колеса */
-}
-
-/* Декоративні елементи, фон */
-.deal-wheel::before, .deal-wheel::after {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* Не даємо взаємодіяти з фоном */
-}
-
-/* Центр колеса */
-.deal-wheel::before {
-  top: -7%;
-  left: 0;
-  background-image: url('../img/center.svg');
-  background-size: 20%;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Кільце колеса */
-.deal-wheel::after {
-  top: -10%;
-  left: -4%;
-  background-image: url('../img/circle.svg');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Спільний стиль для всіх елементів всередині колеса */
-.deal-wheel > * {
-  grid-area: spinner;
-}
-
-/* Стиль для кнопки запуску */
-.deal-wheel .btn-spin {
-  grid-area: trigger;
-  justify-self: center;
-}
-
-/* Стилі для самого колеса */
-.spinner {
-  position: relative;
-  display: grid;
-  align-items: center;
-  width: var(--size);
-  height: var(--size);
-  transform: rotate(calc(var(--rotate, 25) * 1deg)); /* Кут повороту колеса */
-  border-radius: 50%; /* Кругла форма */
-}
-
-/* Тінь під колесом */
-.spinner::after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('../img/shadow.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  transform: rotate(20deg);
-  opacity: 0.6;
-}
-
-/* Стиль для кожного сектору */
-.prize {
-  display: flex;
-  align-items: center;
-  padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 25);
-  width: 46.5%;
-  height: 50%;
-  transform-origin: center right;
-  transform: rotate(var(--rotate)); /* Обертання тексту */
-  user-select: none;
-}
-
-/* Стилі для тексту на секторах */
-.prize.white span {
-  color: #000;
-}
-
-.prize.small span {
-  font-size: 1.4em;
-}
-
-.prize span {
-  color: #fff;
-  text-transform: uppercase;
-  position: relative;
-  left: -20%;
-  font-size: 1.8em;
-  text-shadow: 0 0 5px rgba(0, 0, 0, .3);
-}
-
-/* Стилі для анімації тикера (язычок) */
-.ticker {
-  position: relative;
-  left: -8%;
-  width: 15%;
-  height: 15%;
-  z-index: 1;
-}
-
-.ticker img {
-  display: block;
-  width: 100%;
-  transform: rotate(4deg);
-}
-
-/* Кнопка для запуску колеса */
-.btn-spin {
-  color: white;
-  background: black;
-  border: none;
-  font-size: inherit;
-  padding: 0.9rem 2rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-}
-
-.btn-spin:disabled {
-  cursor: progress;
-  opacity: 0.25;
-}
-
-/* Анімація для обертання колеса */
-.is-spinning .spinner {
-  transition: transform 8s cubic-bezier(0.1, -0.01, 0, 1);
-}
-
-/* Анімація для тикера (язычок) */
-.is-spinning .ticker {
-  animation: tick 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Ефект для вибраного сектора */
-@keyframes tick {
-  40% {
-    transform: rotate(-12deg); /* Поворот язычка */
-  }
-}
-
-/* Анімація для вибраного сектора */
-@keyframes selected {
-  25% {
-    transform: scale(1.25);
-    text-shadow: 1vmin 1vmin 0 hsla(0 0% 0% / 0.1);
-  }
-  40% {
-    transform: scale(0.92);
-    text-shadow: 0 0 0 hsla(0 0% 0% / 0.2);
-  }
-  60% {
-    transform: scale(1.02);
-    text-shadow: 0.5vmin 0.5vmin 0 hsla(0 0% 0% / 0.1);
-  }
-  75% {
-    transform: scale(0.98);
-  }
-  85% {
-    transform: scale(1);
-  }
-}
-
-/* Медіа-запити для адаптації на малих екранах */
-@media (max-width: 420px) {
-  .deal-wheel::after {
-    top: -12%;
-  }
-  .prize {
-    width: 42.5%;
-  }
-  .prize span {
-    left: -60%;
-  }
 }
