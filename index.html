@@ -1,152 +1,138 @@
-<!DOCTYPE html>  
-<html lang="uk">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Колесо Фортуни</title>  
-    <style>  
-        body {  
-            font-family: Arial, sans-serif;  
-            text-align: center;  
-            margin: 30px;  
-        }  
-        #wheel {  
-            width: 300px;  
-            height: 300px;  
-            border: 10px solid #4CAF50;  
-            border-radius: 50%;  
-            display: flex;  
-            align-items: center;  
-            justify-content: center;  
-            position: relative;  
-            transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);  
-        }  
-        .slice {  
-            position: absolute;  
-            width: 50%;  
-            height: 50%;  
-            background-color: #f39c12;  
-            border: 1px solid #fff;  
-            clip-path: polygon(100% 100%, 0 100%, 100% 0);  
-        }  
-        #spinButton {  
-            margin-top: 20px;  
-            padding: 10px 20px;  
-            font-size: 16px;  
-            cursor: pointer;  
-        }  
-        #prize {  
-            margin-top: 20px;  
-            font-size: 24px;  
-            color: #f39c12;  
-        }  
-        #message {  
-            margin-top: 10px;  
-            color: red;  
-        }  
-        #history {  
-            margin-top: 30px;  
-            text-align: left;  
-        }  
-    </style>  
-</head>  
-<body>  
+import { useState, useEffect } from 'react';
 
-    <h1>Крутимо Колесо Фортуни!</h1>  
-    <div id="wheel">  
-        <div class="slice" style="transform: rotate(0deg);">VIP premium на 2 тижня</div>  
-        <div class="slice" style="transform: rotate(60deg);">VIP premium на 1 тиждень</div>  
-        <div class="slice" style="transform: rotate(120deg);">VIP premiumна 3 дня </div>  
-        <div class="slice" style="transform: rotate(180deg);">VIP free на 3 тижня </div>  
-        <div class="slice" style="transform: rotate(240deg);">Prefix на 7 днів </div>  
-        <div class="slice" style="transform: rotate(300deg);">Medic на 4 днів </div>  
-    </div>  
-    <button id="spinButton">Прокрутити колесо</button>  
-    <p id="message"></p>  
-    <p id="prize"></p>  
-    <div id="history"></div>  
+export default function Home() {
+  const [canSpin, setCanSpin] = useState(true);
+  const [prize, setPrize] = useState('');
+  const [history, setHistory] = useState([]);
+  const [timer, setTimer] = useState(0); // Додамо стейт для таймера
 
-    <script>  
-        const wheel = document.getElementById('wheel');  
-        const spinButton = document.getElementById('spinButton');  
-        const message = document.getElementById('message');  
-        const prizeDisplay = document.getElementById('prize');  
-        const historyDisplay = document.getElementById('history');  
-        const prizes = [  
-            "VIP premium на 2 тижня",  
-            "VIP premium на 1 тиждень",  
-            "VIP premiumна 3 дня",  
-            "VIP free на 3 тижня",  
-            "Prefix на 7 днів",  
-            "Medic на 4 днів"  
-        ];  
+  // Призи без відсотків
+  const prizes = [
+    'VIP premium на 2 тижня',
+    'VIP premium на 1 тиждень',
+    'VIP premium на 3 дні',
+    'VIP free на 3 тижня',
+    'Prefix на 7 днів',
+    'Medic на 4 дні',
+    'Повезе у наступний раз',
+    'VIP Fri на 3 тижня',
+    'VIP fri на 2 тижня',
+    'VIP fri на 1 тиждень',
+    'VIP fri на 5 днів',
+    'VIP Fri на 3 дні',
+    'Імунітет на AWP на 3 дні',
+  ];
 
-        // Отримуємо дату останнього обертання з localStorage  
-        let lastSpinDate = localStorage.getItem('lastSpinDate');  
-        let spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];  
+  useEffect(() => {
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    const spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];
+    setHistory(spinHistory);
 
-        function canSpin() {  
-            if (!lastSpinDate) return true; // Дозволяємо обертання, якщо немає збереженої дати  
+    if (lastSpinDate) {
+      const lastSpin = new Date(lastSpinDate);
+      const now = new Date();
+      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+      setCanSpin(now - lastSpin >= oneWeek);
+      
+      // Якщо не можна крутити, додаємо таймер
+      if (now - lastSpin < oneWeek) {
+        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000); // Час до відновлення обертання
+        setTimer(countdown);
+        const timerInterval = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(timerInterval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000); // Оновлення кожну секунду
+        return () => clearInterval(timerInterval); // Очищуємо інтервал при скасуванні компонента
+      }
+    }
+  }, []);
 
-            const lastSpin = new Date(lastSpinDate);  
-            const now = new Date();  
-            const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах  
-            return (now - lastSpin) >= oneWeek; // Повертаємо true, якщо 7 днів пройшло  
-        }  
+  // Функція для вибору призу
+  const getPrize = () => {
+    const randomIndex = Math.floor(Math.random() * prizes.length); // Випадковий індекс
+    return prizes[randomIndex]; // Повертаємо приз
+  };
 
-        function displayHistory() {  
-            historyDisplay.innerHTML = '<h3>Історія призів</h3>';  
-            if (spinHistory.length === 0) {  
-                historyDisplay.innerHTML += '<p>Поки що обертання відсутні.</p>';  
-                return;  
-            }  
-            spinHistory.forEach((spin, index) => {  
-                historyDisplay.innerHTML += `<p>${index + 1}. ${spin.date} - ${spin.prize}</p>`;  
-            });  
-        }  
+  const spinWheel = () => {
+    if (!canSpin) return;
 
-        function updateSpinButtonState() {  
-            if (canSpin()) {  
-                spinButton.disabled = false; // Дозволено обертання  
-                message.textContent = '';  
-            } else {  
-                const nextSpinDate = new Date(new Date(lastSpinDate).getTime() + 7 * 24 * 60 * 60 * 1000);  
-                message.textContent = `Наступне обертання можливе з ${nextSpinDate.toLocaleDateString()}`;  
-                spinButton.disabled = true; // Заборонити обертання  
-            }  
-        }  
+    const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 обертами
+    const wonPrize = getPrize(); // Отримуємо приз
 
-        spinButton.addEventListener('click', () => {  
-            if (!canSpin()) return; // Якщо обертання заборонено, нічого не робимо  
+    // Збереження обертання
+    const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
+    setHistory(newHistory);
+    localStorage.setItem('spinHistory', JSON.stringify(newHistory));
+    localStorage.setItem('lastSpinDate', new Date().toISOString());
+    setPrize(wonPrize);
+    setCanSpin(false);
+  };
 
-            // Записуємо нову дату обертання  
-            lastSpinDate = new Date().toISOString();  
-            localStorage.setItem('lastSpinDate', lastSpinDate);  
-            message.textContent = 'Ви прокрутили колесо!';  
-
-            // Генеруємо випадковий кут обертання  
-            const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут з 3 оборотами  
-            wheel.style.transform = `rotate(${rotation}deg)`;  
-
-            // Визначаємо приз через 4 секунди  
-            setTimeout(() => {  
-                const prizeIndex = Math.floor(((rotation % 360) / 60) % prizes.length);  
-                const prize = prizes[prizeIndex];  
-                prizeDisplay.textContent = `Ви виграли: ${prize}`;  
-
-                // Зберігаємо обертання в історії  
-                spinHistory.push({ date: new Date().toLocaleString(), prize });  
-                localStorage.setItem('spinHistory', JSON.stringify(spinHistory));  
-                displayHistory();  
-                updateSpinButtonState(); // Оновлюємо стан кнопки  
-            }, 4000);  
-        });  
-
-        // Перевіряємо можливість обертання при завантаженні сторінки  
-        displayHistory();  
-        updateSpinButtonState(); // Змінюємо стан кнопки на початку  
-
-    </script>  
-
-</body>  
-</html>
+  return (
+    <div style={{ textAlign: 'center', margin: '30px' }}>
+      <h1>Крутимо Колесо Фортуни!</h1>
+      <div
+        id="wheel"
+        style={{
+          width: '300px',
+          height: '300px',
+          border: '10px solid #4CAF50',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          transition: 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)',
+        }}
+      >
+        {prizes.map((prize, index) => (
+          <div
+            key={index}
+            style={{
+              position: 'absolute',
+              width: '50%',
+              height: '50%',
+              backgroundColor: '#f39c12',
+              border: '1px solid #fff',
+              clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+              transform: `rotate(${index * 60}deg)`,
+            }}
+          >
+            {prize}
+          </div>
+        ))}
+      </div>
+      <button
+        id="spinButton"
+        onClick={spinWheel}
+        disabled={!canSpin}
+        style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+      >
+        {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
+      </button>
+      <p id="message" style={{ marginTop: '10px', color: 'red' }}>
+        {!canSpin ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.` : ''}
+      </p>
+      <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
+        {prize ? `Ви виграли: ${prize}` : ''}
+      </p>
+      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Історія призів</h3>
+        {history.length === 0 ? (
+          <p>Поки що обертання відсутні.</p>
+        ) : (
+          history.map((spin, index) => (
+            <p key={index}>
+              {index + 1}. {spin.date} - {spin.prize}
+            </p>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
