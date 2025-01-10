@@ -90,32 +90,36 @@ export default function Home() {
         }}
       >
         {/* Сектора колеса */}
-        {prizes.map((prize, index) => (
-          <div
-            key={index}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: '50%',
-              height: '50%',
-              backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`, // Кольори секторів
-              transformOrigin: '100% 100%',
-              transform: `rotate(${(360 / prizes.length) * index}deg)`,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: '#fff',
-              fontWeight: 'bold',
-              fontSize: '14px',
-              padding: '10px',
-              clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
-              textAlign: 'center',
-            }}
-          >
-            {prize.name}
-          </div>
-        ))}
+        {prizes.map((prize, index) => {
+          const angle = (360 / prizes.length) * index;
+          return (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '50%',
+                height: '50%',
+                backgroundColor: `hsl(${(angle * 360) / prizes.length}, 70%, 60%)`, // Кольори секторів
+                transformOrigin: '100% 100%',
+                transform: `rotate(${angle}deg)`,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: '#fff',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                padding: '10px',
+                clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+                textAlign: 'center',
+                lineHeight: '1.5', // Вирівнювання тексту
+              }}
+            >
+              {prize.name}
+            </div>
+          );
+        })}
       </div>
 
       <button
@@ -164,3 +168,4 @@ export default function Home() {
     </div>
   );
 }
+
