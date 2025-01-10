@@ -66,6 +66,7 @@ export default function Home() {
 
     // Застосування обертання до колеса
     const wheel = document.getElementById("wheel");
+    wheel.style.transition = "transform 4s ease-out";  // Додаємо плавність
     wheel.style.transform = `rotate(${rotation}deg)`;
   };
 
@@ -79,51 +80,40 @@ export default function Home() {
           height: '350px',
           border: '10px solid #4CAF50',
           borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           position: 'relative',
-          transition: 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)',
           overflow: 'hidden',
+          margin: '0 auto',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            transform: 'rotate(0deg)',
-          }}
-        >
-          {prizes.map((prize, index) => (
-            <div
-              key={index}
-              style={{
-                position: 'absolute',
-                top: `${(index * 100) / prizes.length}%`,
-                width: '100%',
-                height: `${100 / prizes.length}%`,
-                backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`,
-                textAlign: 'center',
-                color: '#fff',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                lineHeight: '3',  // Центруємо текст вертикально
-                padding: '10px 0',
-                transform: `rotate(${(360 / prizes.length) * index}deg)`,
-              }}
-            >
-              {prize.name}
-            </div>
-          ))}
-        </div>
+        {/* Кільце колеса */}
+        {prizes.map((prize, index) => (
+          <div
+            key={index}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: '50%',
+              height: '50%',
+              backgroundColor: `hsl(${(index * 360) / prizes.length}, 70%, 60%)`,
+              transformOrigin: '0% 0%',
+              transform: `rotate(${(360 / prizes.length) * index}deg)`,
+              textAlign: 'right',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: '#fff',
+              fontWeight: 'bold',
+              fontSize: '14px',
+              padding: '10px',
+              clipPath: 'polygon(100% 100%, 0 100%, 100% 0)',
+            }}
+          >
+            {prize.name}
+          </div>
+        ))}
       </div>
+
       <button
         id="spinButton"
         onClick={spinWheel}
@@ -170,3 +160,4 @@ export default function Home() {
     </div>
   );
 }
+
