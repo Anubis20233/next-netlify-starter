@@ -3,10 +3,14 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const [canSpin, setCanSpin] = useState(true);
   const [prize, setPrize] = useState('');
+  const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [userPrize, setUserPrize] = useState('');
 
+  // Призи
   const prizes = [
     'VIP premium на 2 тижня',
     'VIP premium на 1 тиждень',
@@ -23,7 +27,36 @@ export default function Home() {
     'Імунітет на AWP на 3 дні',
   ];
 
-  // Отримуємо випадковий приз
+  useEffect(() => {
+    // Завантажуємо історію виграшів з localStorage
+    const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
+    setHistory(prizeData);
+
+    // Перевірка часу, коли можна прокручувати колесо
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    if (lastSpinDate) {
+      const lastSpin = new Date(lastSpinDate);
+      const now = new Date();
+      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів
+      setCanSpin(now - lastSpin >= oneWeek);
+
+      if (now - lastSpin < oneWeek) {
+        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000);
+        setTimer(countdown);
+        const timerInterval = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(timerInterval);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return () => clearInterval(timerInterval);
+      }
+    }
+  }, []);
+
   const getPrize = () => {
     const randomIndex = Math.floor(Math.random() * prizes.length);
     return prizes[randomIndex];
@@ -33,13 +66,46 @@ export default function Home() {
     if (!canSpin) return;
 
     const wonPrize = getPrize();
+    const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
+    setHistory(newHistory);
+    localStorage.setItem('spinHistory', JSON.stringify(newHistory));
+    localStorage.setItem('lastSpinDate', new Date().toISOString());
     setPrize(wonPrize);
-    setUserPrize(wonPrize);
     setCanSpin(false);
-    setIsFormVisible(true); // Показуємо форму після виграшу
+    setUserPrize(wonPrize);
+    setIsFormVisible(true); // Відкриваємо форму після виграшу
   };
 
-  
+  const submitForm = (e) => {
+    e.preventDefault();
+    if (userName && userEmail && userPrize) {
+      // Simple email validation check
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      if (!emailPattern.test(userEmail)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
+      const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
+
+      // Завантажуємо всі дані з localStorage та додаємо новий запис
+      const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
+      
+      // Перевірка, чи немає вже цього користувача в історії (щоб не записувати повторно)
+      const userExists = prizeData.some((item) => item.email === userEmail);
+      if (!userExists) {
+        prizeData.push(userData); // Додаємо новий запис
+        localStorage.setItem('prizeData', JSON.stringify(prizeData)); // Оновлюємо localStorage
+      }
+
+      // Оновлюємо стейт та очищуємо форму
+      setUserName('');
+      setUserEmail('');
+      setUserPrize('');
+      setIsFormVisible(false); // Закриваємо форму
+      setHistory(prizeData); // Оновлюємо історію
+    }
+  };
 
   return (
     <div style={{ textAlign: 'center', margin: '30px' }}>
@@ -83,6 +149,11 @@ export default function Home() {
       >
         {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
       </button>
+      <p id="message" style={{ marginTop: '10px', color: 'red' }}>
+        {!canSpin
+          ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.`
+          : ''}
+      </p>
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
@@ -113,10 +184,45 @@ export default function Home() {
             }}
           >
             <h3>Заповніть форму для отримання призу</h3>
-            <p>
-              Для отримання вашого виграного призу, будь ласка, заповніть
-              форму: <a href={formLink} target="_blank" rel="noopener noreferrer">Заповнити форму</a>
-            </p>
+            <form onSubmit={submitForm}>
+              <input
+                type="text"
+                placeholder="Ваше Нік в грі"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="email"
+                placeholder="Ваш емейл"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="text"
+                placeholder="Виграний приз"
+                value={userPrize}
+                readOnly
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Відправити
+              </button>
+            </form>
             <button
               onClick={() => setIsFormVisible(false)}
               style={{
@@ -134,6 +240,39 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Історія виграшів */}
+      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Історія виграшів</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Ім'я</th>
+              <th>Email</th>
+              <th>Виграний приз</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.length === 0 ? (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center' }}>
+                  Поки що немає записів.
+                </td>
+              </tr>
+            ) : (
+              history.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>{item.email}</td>
+                  <td>{item.prize}</td>
+                  <td>{item.date}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
