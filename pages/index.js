@@ -79,7 +79,7 @@ export default function Home() {
   const submitForm = (e) => {
     e.preventDefault();
     if (userName && userEmail && userPrize) {
-      const userData = { name: userName, email: userEmail, prize: userPrize };
+      const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
 
       // Завантажуємо всі дані з localStorage та додаємо новий запис
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
