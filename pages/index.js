@@ -97,9 +97,31 @@ export default function Home() {
       setUserPrize('');
       setIsFormVisible(false); // Закриваємо форму
       setHistory(prizeData); // Оновлюємо історію
+
+      // Викликаємо функцію для відправки даних до Google Sheets
+      sendDataToGoogleSheets(userData);
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
+  };
+
+  const sendDataToGoogleSheets = (userData) => {
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwU7E9DT0iqDhlgAviwVHDJp9owo80okx7Otn7wMGkBXF4cHgm_btgdkLaD6I72FxxhUA/exec"; // Ваш URL скрипта
+
+    // Створюємо запит
+    const payload = {
+      method: "POST",
+      body: JSON.stringify({ data: userData }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    // Виконуємо запит
+    fetch(scriptUrl, payload)
+      .then((response) => response.json())
+      .then((data) => console.log("Дані успішно додано до Google Таблиці:", data))
+      .catch((error) => console.error("Помилка:", error));
   };
 
   return (
@@ -145,7 +167,9 @@ export default function Home() {
         {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
       </button>
       <p id="message" style={{ marginTop: '10px', color: 'red' }}>
-        {!canSpin ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.` : ''}
+        {!canSpin
+          ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.`
+          : ''}
       </p>
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
         {prize ? `Ви виграли: ${prize}` : ''}
@@ -249,7 +273,9 @@ export default function Home() {
           <tbody>
             {history.length === 0 ? (
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center' }}>Поки що немає записів.</td>
+                <td colSpan="4" style={{ textAlign: 'center' }}>
+                  Поки що немає записів.
+                </td>
               </tr>
             ) : (
               history.map((item, index) => (
