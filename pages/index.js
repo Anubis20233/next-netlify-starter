@@ -102,26 +102,21 @@ export default function Home() {
 
       // Відправка даних на Google Form через fetch
       fetch(formUrl, {
-        method: 'POST',
-        body: formData,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Невдала відправка даних');
-          }
-          return response;
-        })
-        .then(() => {
-          alert('Дякуємо! Ваші дані надіслано.');
-          setUserName('');
-          setUserEmail('');
-          setUserPrize('');
-          setIsFormVisible(false);  // Закрити форму
-        })
-        .catch((error) => {
-          console.error('Помилка відправки:', error);
-          alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
-        });
+  method: 'POST',
+  body: formData,
+  mode: 'no-cors', // Додаємо режим 'no-cors'
+})
+.then(() => {
+  alert('Дякуємо! Ваші дані надіслано.');
+  setUserName('');
+  setUserEmail('');
+  setUserPrize('');
+  setIsFormVisible(false);
+})
+.catch((error) => {
+  console.error('Помилка відправки:', error);
+  alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
+});
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
