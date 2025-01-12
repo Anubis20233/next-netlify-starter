@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [canSpin, setCanSpin] = useState(true); // Можна чи не можна крутити колесо
-  const [prize, setPrize] = useState(''); // Виграний приз
-  const [history, setHistory] = useState([]); // Історія обертів
-  const [timer, setTimer] = useState(0); // Таймер на наступне обертання
-  const [isFormVisible, setIsFormVisible] = useState(false); // Чи відображати форму
-  const [userName, setUserName] = useState(''); // Ім'я користувача
-  const [userEmail, setUserEmail] = useState(''); // Емейл користувача
-  const [userPrize, setUserPrize] = useState(''); // Виграний приз, який буде переданий у форму
+  const [canSpin, setCanSpin] = useState(true);
+  const [prize, setPrize] = useState('');
+  const [history, setHistory] = useState([]);
+  const [timer, setTimer] = useState(0);
+  const [isFormVisible, setIsFormVisible] = useState(false); // Стейт для показу модального вікна
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPrize, setUserPrize] = useState('');
 
-  // Призи
   const prizes = [
     'VIP premium на 2 тижня',
     'VIP premium на 1 тиждень',
@@ -27,7 +26,6 @@ export default function Home() {
     'Імунітет на AWP на 3 дні',
   ];
 
-  // Зчитуємо збережену історію обертів та перевіряємо час для наступного спіну
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
     const spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];
@@ -36,14 +34,12 @@ export default function Home() {
     if (lastSpinDate) {
       const lastSpin = new Date(lastSpinDate);
       const now = new Date();
-      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
-      setCanSpin(now - lastSpin >= oneWeek); // Визначаємо, чи можна крутити
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      setCanSpin(now - lastSpin >= oneWeek);
 
       if (now - lastSpin < oneWeek) {
-        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000); // Час до наступного спіну
+        const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000);
         setTimer(countdown);
-
-        // Запускаємо таймер
         const timerInterval = setInterval(() => {
           setTimer((prev) => {
             if (prev <= 1) {
@@ -52,57 +48,45 @@ export default function Home() {
             }
             return prev - 1;
           });
-        }, 1000); // Оновлюємо кожну секунду
-        return () => clearInterval(timerInterval); // Очищаємо інтервал при скасуванні компонента
+        }, 1000);
+        return () => clearInterval(timerInterval);
       }
     }
   }, []);
 
-  // Функція для вибору випадкового призу
   const getPrize = () => {
     const randomIndex = Math.floor(Math.random() * prizes.length);
     return prizes[randomIndex];
   };
 
-  // Функція для спіну колеса
   const spinWheel = () => {
-    if (!canSpin) return; // Якщо не можна крутити, нічого не робимо
+    if (!canSpin) return;
 
-    const rotation = Math.floor(360 * (Math.random() + 3)); // Випадковий кут для обертання
-    const wonPrize = getPrize(); // Отримуємо приз
-
-    // Оновлюємо історію обертів
+    const wonPrize = getPrize();
     const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
     setHistory(newHistory);
     localStorage.setItem('spinHistory', JSON.stringify(newHistory));
     localStorage.setItem('lastSpinDate', new Date().toISOString());
     setPrize(wonPrize);
-    setCanSpin(false); // Вимикаємо можливість спіну
-    setUserPrize(wonPrize); // Зберігаємо виграний приз
-    setIsFormVisible(true); // Показуємо форму
+    setCanSpin(false);
+    setUserPrize(wonPrize);
+    setIsFormVisible(true); // Відкриваємо форму після виграшу
   };
 
-  // Функція для відправки форми
   const submitForm = (e) => {
-    e.preventDefault(); // Запобігаємо перезавантаженню сторінки
+    e.preventDefault();
     if (userName && userEmail && userPrize) {
-      const userData = {
-        name: userName,
-        email: userEmail,
-        prize: userPrize,
-      };
-      
-      // Зберігаємо дані у localStorage
+      const userData = { name: userName, email: userEmail, prize: userPrize };
+
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
       prizeData.push(userData);
       localStorage.setItem('prizeData', JSON.stringify(prizeData));
 
-      // Очищаємо форму
-      setIsFormVisible(false);
       setUserName('');
       setUserEmail('');
       setUserPrize('');
-      alert('Ваші дані успішно збережено!');
+      setIsFormVisible(false); // Закриваємо форму
+      setHistory(prizeData);
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
@@ -111,8 +95,6 @@ export default function Home() {
   return (
     <div style={{ textAlign: 'center', margin: '30px' }}>
       <h1>Крутимо Колесо Фортуни!</h1>
-
-      {/* Відображення колеса */}
       <div
         id="wheel"
         style={{
@@ -144,8 +126,6 @@ export default function Home() {
           </div>
         ))}
       </div>
-
-      {/* Кнопка для спіну колеса */}
       <button
         id="spinButton"
         onClick={spinWheel}
@@ -154,60 +134,120 @@ export default function Home() {
       >
         {canSpin ? 'Прокрутити колесо' : 'Недоступно'}
       </button>
-
-      {/* Повідомлення про доступність спіну */}
       <p id="message" style={{ marginTop: '10px', color: 'red' }}>
         {!canSpin ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.` : ''}
       </p>
-
-      {/* Повідомлення про виграний приз */}
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
 
-      {/* Історія обертів */}
-      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
-        <h3>Історія призів</h3>
-        {history.length === 0 ? (
-          <p>Поки що обертання відсутні.</p>
-        ) : (
-          history.map((spin, index) => (
-            <p key={index}>
-              {index + 1}. {spin.date} - {spin.prize}
-            </p>
-          ))
-        )}
-      </div>
-
-      {/* Форма для введення даних користувача */}
+      {/* Модальне вікно для форми */}
       {isFormVisible && (
-        <div style={{ marginTop: '30px' }}>
-          <h3>Заповніть форму</h3>
-          <form onSubmit={submitForm}>
-            <input
-              type="text"
-              placeholder="Ваше ім'я"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              required
-            />
-            <input
-              type="email"
-              placeholder="Ваш емейл"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Виграний приз"
-              value={userPrize}
-              readOnly // Приз не можна змінювати
-            />
-            <button type="submit">Відправити</button>
-          </form>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#fff',
+              padding: '20px',
+              borderRadius: '8px',
+              width: '400px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            <h3>Заповніть форму для отримання призу</h3>
+            <form onSubmit={submitForm}>
+              <input
+                type="text"
+                placeholder="Ваше ім'я"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="email"
+                placeholder="Ваш емейл"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="text"
+                placeholder="Виграний приз"
+                value={userPrize}
+                readOnly
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Відправити
+              </button>
+            </form>
+            <button
+              onClick={() => setIsFormVisible(false)}
+              style={{
+                marginTop: '10px',
+                padding: '10px 20px',
+                backgroundColor: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Закрити
+            </button>
+          </div>
         </div>
       )}
+
+      {/* Історія виграшів */}
+      <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
+        <h3>Історія виграшів</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th>Ім'я</th>
+              <th>Email</th>
+              <th>Виграний приз</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((item, index) => (
+              <tr key={index}>
+                <td>{item.name}</td>
+                <td>{item.email}</td>
+                <td>{item.prize}</td>
+                <td>{item.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
