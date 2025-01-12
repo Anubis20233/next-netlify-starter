@@ -39,7 +39,8 @@ export default function Home() {
     setIsFormVisible(true); // Показуємо форму після виграшу
   };
 
-  const formLink = `https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/viewform?usp=header?entry.249957477=${encodeURIComponent(userPrize)}`;
+  const formLink = `https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/viewform?usp=header?entry.249957477=${encodeURIComponent(userPrize)}&entry.1597821656=${encodeURIComponent(userName)}&entry.210889611=${encodeURIComponent(userEmail)}`;
+
 
   return (
     <div style={{ textAlign: 'center', margin: '30px' }}>
