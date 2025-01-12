@@ -79,6 +79,13 @@ export default function Home() {
   const submitForm = (e) => {
     e.preventDefault();
     if (userName && userEmail && userPrize) {
+      // Simple email validation check
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      if (!emailPattern.test(userEmail)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
       const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
 
       // Завантажуємо всі дані з localStorage та додаємо новий запис
@@ -265,11 +272,6 @@ export default function Home() {
             )}
           </tbody>
         </table>
-      </div>
-    </div>
-  );
-}
-
       </div>
     </div>
   );
