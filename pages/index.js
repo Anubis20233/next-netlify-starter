@@ -5,11 +5,12 @@ export default function Home() {
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
-  const [isFormVisible, setIsFormVisible] = useState(false); // Стейт для показу модального вікна
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPrize, setUserPrize] = useState('');
 
+  // Призи
   const prizes = [
     'VIP premium на 2 тижня',
     'VIP premium на 1 тиждень',
@@ -78,6 +79,7 @@ export default function Home() {
     if (userName && userEmail && userPrize) {
       const userData = { name: userName, email: userEmail, prize: userPrize };
 
+      // Отримуємо всі дані з LocalStorage і додаємо новий запис
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
       prizeData.push(userData);
       localStorage.setItem('prizeData', JSON.stringify(prizeData));
@@ -86,7 +88,7 @@ export default function Home() {
       setUserEmail('');
       setUserPrize('');
       setIsFormVisible(false); // Закриваємо форму
-      setHistory(prizeData);
+      setHistory(prizeData); // Оновлюємо історію
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
@@ -251,4 +253,3 @@ export default function Home() {
     </div>
   );
 }
-
