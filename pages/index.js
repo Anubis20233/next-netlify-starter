@@ -71,38 +71,52 @@ export default function Home() {
   };
 
   const submitForm = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Забороняє стандартну поведінку форми, щоб не відправляти її автоматично.
+
     if (userName && userEmail && userPrize) {
+      // Перевірка на коректність email
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
       if (!emailPattern.test(userEmail)) {
         alert('Будь ласка, введіть дійсну електронну адресу');
         return;
       }
 
+      // Логування даних перед відправкою
+      console.log('Дані для відправки:', {
+        name: userName,
+        email: userEmail,
+        prize: userPrize,
+      });
+
+      // Створення об'єкта FormData для відправки через Google Form
       const formData = new FormData();
-      formData.append('entry.210889611', userName);
-      formData.append('entry.2127313793', userEmail);
-      formData.append('entry.249957477', userPrize);
+      formData.append('entry.210889611', userName); // ID поля "Ім'я"
+      formData.append('entry.2127313793', userEmail); // ID поля "Email"
+      formData.append('entry.249957477', userPrize); // ID поля "Приз"
+
+      // Додаткове приховане поле
+      formData.append('dlut', '1736695265301'); // Використовуємо значення для dlut
 
       const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse';
 
-      fetch(formUrl, { method: 'POST', body: formData })
+      // Логування для fetch
+      console.log('Відправка на URL:', formUrl);
+
+      // Відправка даних на Google Form через fetch
+      fetch(formUrl, {
+        method: 'POST',
+        body: formData,
+      })
         .then(() => {
           alert('Дякуємо! Ваші дані надіслано.');
-          const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
-          const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
-          prizeData.push(userData);
-          localStorage.setItem('prizeData', JSON.stringify(prizeData));
-          setHistory(prizeData);
-
           setUserName('');
           setUserEmail('');
           setUserPrize('');
-          setIsFormVisible(false);
+          setIsFormVisible(false);  // Закрити форму
         })
         .catch((error) => {
           console.error('Помилка відправки:', error);
-          alert('Сталася помилка при відправці даних.');
+          alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
         });
     } else {
       alert('Будь ласка, заповніть всі поля!');
@@ -196,44 +210,44 @@ export default function Home() {
           >
             <h3>Заповніть форму для отримання призу</h3>
             <form onSubmit={submitForm}>
-               <input
-    type="text"
-    placeholder="Ваше Нік в грі"
-    value={userName}
-    onChange={(e) => setUserName(e.target.value)}
-    required
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <input
-    type="email"
-    placeholder="Ваш емейл"
-    value={userEmail}
-    onChange={(e) => setUserEmail(e.target.value)}
-    required
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <input
-    type="text"
-    placeholder="Виграний приз"
-    value={userPrize}
-    readOnly
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <button
-    type="submit"
-    style={{
-      width: '100%',
-      padding: '10px',
-      backgroundColor: '#4CAF50',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-    }}
-  >
-    Відправити
-  </button>
-</form>
+              <input
+                type="text"
+                placeholder="Ваше Нік в грі"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="email"
+                placeholder="Ваш емейл"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="text"
+                placeholder="Виграний приз"
+                value={userPrize}
+                readOnly
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Відправити
+              </button>
+            </form>
             <button
               onClick={() => setIsFormVisible(false)}
               style={{
