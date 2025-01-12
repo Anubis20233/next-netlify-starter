@@ -10,7 +10,6 @@ export default function Home() {
   const [userEmail, setUserEmail] = useState('');
   const [userPrize, setUserPrize] = useState('');
 
-  // Призи
   const prizes = [
     'VIP premium на 2 тижня',
     'VIP premium на 1 тиждень',
@@ -28,11 +27,9 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    // Завантажуємо історію виграшів з localStorage
     const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
     setHistory(prizeData);
 
-    // Перевірка часу, коли можна прокручувати колесо
     const lastSpinDate = localStorage.getItem('lastSpinDate');
     if (lastSpinDate) {
       const lastSpin = new Date(lastSpinDate);
@@ -57,10 +54,7 @@ export default function Home() {
     }
   }, []);
 
-  const getPrize = () => {
-    const randomIndex = Math.floor(Math.random() * prizes.length);
-    return prizes[randomIndex];
-  };
+  const getPrize = () => prizes[Math.floor(Math.random() * prizes.length)];
 
   const spinWheel = () => {
     if (!canSpin) return;
@@ -68,67 +62,60 @@ export default function Home() {
     const wonPrize = getPrize();
     const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
     setHistory(newHistory);
-    localStorage.setItem('prizeData', JSON.stringify(newHistory));  // Оновлюємо дані в локальному сховищі
+    localStorage.setItem('prizeData', JSON.stringify(newHistory));
     localStorage.setItem('lastSpinDate', new Date().toISOString());
     setPrize(wonPrize);
     setCanSpin(false);
     setUserPrize(wonPrize);
-    setIsFormVisible(true); // Відкриваємо форму після виграшу
+    setIsFormVisible(true);
   };
 
   const submitForm = (e) => {
     e.preventDefault();
     if (userName && userEmail && userPrize) {
-      // Просте перевірка email
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
       if (!emailPattern.test(userEmail)) {
         alert('Будь ласка, введіть дійсну електронну адресу');
         return;
       }
 
-      // Створення даних для форми
       const formData = new FormData();
-      formData.append('entry.210889611', userName); // ID поля "Ім'я"
-      formData.append('entry.2127313793', userEmail); // ID поля "Email"
-      formData.append('entry.249957477', userPrize); // ID поля "Приз"
+      formData.append('entry.210889611', userName);
+      formData.append('entry.2127313793', userEmail);
+      formData.append('entry.249957477', userPrize);
 
-      // Ваша URL Google форми
-      const formUrl = https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse
+      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse';
 
-      // Відправлення даних до Google форми
-      fetch(formUrl, {
-        method: 'POST',
-        body: formData,
-      })
+      fetch(formUrl, { method: 'POST', body: formData })
         .then(() => {
           alert('Дякуємо! Ваші дані надіслано.');
-          // Оновлюємо історію виграшів у локальному сховищі
           const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
           const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
           prizeData.push(userData);
           localStorage.setItem('prizeData', JSON.stringify(prizeData));
-          setHistory(prizeData); // Оновлюємо історію
-          // Очищаємо форму
+          setHistory(prizeData);
+
           setUserName('');
           setUserEmail('');
           setUserPrize('');
-          setIsFormVisible(false); // Закриваємо форму
+          setIsFormVisible(false);
         })
         .catch((error) => {
           console.error('Помилка відправки:', error);
           alert('Сталася помилка при відправці даних.');
         });
+    } else {
+      alert('Будь ласка, заповніть всі поля!');
     }
   };
 
-  // Функція для форматування таймера
   const formatTime = (seconds) => {
     const days = Math.floor(seconds / (24 * 60 * 60));
     const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
     const minutes = Math.floor((seconds % (60 * 60)) / 60);
     const remainingSeconds = seconds % 60;
 
-    return `${days} днів ${hours} годин ${minutes} хвилин ${remainingSeconds} секунд`;
+    return `${days > 0 ? `${days} днів ` : ''}${hours > 0 ? `${hours} годин ` : ''}${minutes > 0 ? `${minutes} хвилин ` : ''}${remainingSeconds} секунд`;
   };
 
   return (
@@ -209,44 +196,44 @@ export default function Home() {
           >
             <h3>Заповніть форму для отримання призу</h3>
             <form onSubmit={submitForm}>
-              <input
-                type="text"
-                placeholder="Ваше Нік в грі"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                required
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <input
-                type="email"
-                placeholder="Ваш емейл"
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                required
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <input
-                type="text"
-                placeholder="Виграний приз"
-                value={userPrize}
-                readOnly
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <button
-                type="submit"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Відправити
-              </button>
-            </form>
+               <input
+    type="text"
+    placeholder="Ваше Нік в грі"
+    value={userName}
+    onChange={(e) => setUserName(e.target.value)}
+    required
+    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+  />
+  <input
+    type="email"
+    placeholder="Ваш емейл"
+    value={userEmail}
+    onChange={(e) => setUserEmail(e.target.value)}
+    required
+    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+  />
+  <input
+    type="text"
+    placeholder="Виграний приз"
+    value={userPrize}
+    readOnly
+    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+  />
+  <button
+    type="submit"
+    style={{
+      width: '100%',
+      padding: '10px',
+      backgroundColor: '#4CAF50',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+    }}
+  >
+    Відправити
+  </button>
+</form>
             <button
               onClick={() => setIsFormVisible(false)}
               style={{
