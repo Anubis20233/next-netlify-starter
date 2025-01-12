@@ -93,7 +93,7 @@ export default function Home() {
       formData.append('entry.249957477', userPrize); // ID поля "Приз"
 
       // Ваша URL Google форми
-      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/viewform?usp=header/formResponse';
+      const formUrl = https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse
 
       // Відправлення даних до Google форми
       fetch(formUrl, {
