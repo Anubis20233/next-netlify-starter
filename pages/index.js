@@ -28,14 +28,16 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const spinHistory = JSON.parse(localStorage.getItem('spinHistory')) || [];
+    // Завантажуємо історію виграшів з localStorage
+    const spinHistory = JSON.parse(localStorage.getItem('prizeData')) || [];
     setHistory(spinHistory);
 
+    // Перевіряємо час для наступного обертання
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
     if (lastSpinDate) {
       const lastSpin = new Date(lastSpinDate);
       const now = new Date();
-      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів
       setCanSpin(now - lastSpin >= oneWeek);
 
       if (now - lastSpin < oneWeek) {
@@ -239,17 +241,24 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {history.map((item, index) => (
-              <tr key={index}>
-                <td>{item.name}</td>
-                <td>{item.email}</td>
-                <td>{item.prize}</td>
-                <td>{item.date}</td>
+            {history.length === 0 ? (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center' }}>Поки що немає записів.</td>
               </tr>
-            ))}
+            ) : (
+              history.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>{item.email}</td>
+                  <td>{item.prize}</td>
+                  <td>{item.date}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
     </div>
   );
 }
+
