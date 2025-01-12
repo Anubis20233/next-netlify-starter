@@ -71,60 +71,56 @@ export default function Home() {
   };
 
   const submitForm = (e) => {
-    e.preventDefault(); // Забороняє стандартну поведінку форми, щоб не відправляти її автоматично.
+  e.preventDefault(); // Забороняє стандартну поведінку форми
 
-    if (userName && userEmail && userPrize) {
-      // Перевірка на коректність email
-      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      if (!emailPattern.test(userEmail)) {
-        alert('Будь ласка, введіть дійсну електронну адресу');
-        return;
-      }
-
-      // Логування даних перед відправкою
-      console.log('Дані для відправки:', {
-        name: userName,
-        email: userEmail,
-        prize: userPrize,
-      });
-
-      // Створення FormData для відправки через FormDesigner
-      const formData = new FormData();
-      formData.append('name', userName); // Ім'я користувача
-      formData.append('email', userEmail); // Електронна пошта
-      formData.append('prize', userPrize); // Виграний приз
-
-      // URL для відправки на ваш FormDesigner
-      const formUrl = 'https://formdesigner.com.ua/form/view/228907'; // Заміни на свій URL
-
-      // Логування для fetch
-      console.log('Відправка на URL:', formUrl);
-
-      // Відправка даних на FormDesigner через fetch
-      fetch(formUrl, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Origin': 'https://kolesofortuni.netlify.app', // Ваш сайт
-        },
-      })
-        .then((response) => response.json()) // Якщо FormDesigner повертає JSON
-        .then((data) => {
-          alert('Дякуємо! Ваші дані надіслано.');
-          console.log('Відповідь від сервера:', data); // Логування відповіді від сервера
-          setUserName('');
-          setUserEmail('');
-          setUserPrize('');
-          setIsFormVisible(false);
-        })
-        .catch((error) => {
-          console.error('Помилка відправки:', error);
-          alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
-        });
-    } else {
-      alert('Будь ласка, заповніть всі поля!');
+  if (userName && userEmail && userPrize) {
+    // Перевірка на коректність email
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailPattern.test(userEmail)) {
+      alert('Будь ласка, введіть дійсну електронну адресу');
+      return;
     }
-  };
+
+    // Логування даних перед відправкою
+    console.log('Дані для відправки:', {
+      name: userName,
+      email: userEmail,
+      prize: userPrize,
+    });
+
+    // Формування об'єкта з даними форми
+    const formData = {
+      entry_210889611: userName, // ID поля "Ім'я"
+      entry_2127313793: userEmail, // ID поля "Email"
+      entry_249957477: userPrize, // ID поля "Приз"
+    };
+
+    const formUrl = 'http://localhost:5000/submit'; // Локальний сервер
+
+    // Відправка даних на сервер за допомогою fetch
+    fetch(formUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData), // Відправка даних
+    })
+      .then((response) => response.json()) // Очікуємо JSON-дані від сервера
+      .then((data) => {
+        alert('Дякуємо! Ваші дані надіслано.');
+        setUserName('');
+        setUserEmail('');
+        setUserPrize('');
+        setIsFormVisible(false);
+      })
+      .catch((error) => {
+        console.error('Помилка відправки:', error);
+        alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
+      });
+  } else {
+    alert('Будь ласка, заповніть всі поля!');
+  }
+};
 
   const formatTime = (seconds) => {
     const days = Math.floor(seconds / (24 * 60 * 60));
