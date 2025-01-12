@@ -88,40 +88,39 @@ export default function Home() {
         prize: userPrize,
       });
 
-      // Створення об'єкта FormData для відправки через Google Form
+      // Створення FormData для відправки через FormDesigner
       const formData = new FormData();
-      formData.append('entry.210889611', userName); // ID поля "Ім'я"
-      formData.append('entry.2127313793', userEmail); // ID поля "Email"
-      formData.append('entry.249957477', userPrize); // ID поля "Приз"
-      formData.append('dlut', '1736695265301'); // Додаткове приховане поле
+      formData.append('name', userName); // Ім'я користувача
+      formData.append('email', userEmail); // Електронна пошта
+      formData.append('prize', userPrize); // Виграний приз
 
-      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse';
+      // URL для відправки на ваш FormDesigner
+      const formUrl = 'https://formdesigner.com.ua/form/view/228907'; // Заміни на свій URL
 
       // Логування для fetch
       console.log('Відправка на URL:', formUrl);
 
-      // Додаємо проксі-сервер
-      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      
-      // Відправка даних на Google Form через fetch
-      fetch(proxyUrl + formUrl, {
+      // Відправка даних на FormDesigner через fetch
+      fetch(formUrl, {
         method: 'POST',
         body: formData,
         headers: {
           'Origin': 'https://kolesofortuni.netlify.app', // Ваш сайт
         },
       })
-      .then(() => {
-        alert('Дякуємо! Ваші дані надіслано.');
-        setUserName('');
-        setUserEmail('');
-        setUserPrize('');
-        setIsFormVisible(false);
-      })
-      .catch((error) => {
-        console.error('Помилка відправки:', error);
-        alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
-      });
+        .then((response) => response.json()) // Якщо FormDesigner повертає JSON
+        .then((data) => {
+          alert('Дякуємо! Ваші дані надіслано.');
+          console.log('Відповідь від сервера:', data); // Логування відповіді від сервера
+          setUserName('');
+          setUserEmail('');
+          setUserPrize('');
+          setIsFormVisible(false);
+        })
+        .catch((error) => {
+          console.error('Помилка відправки:', error);
+          alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
+        });
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
@@ -284,4 +283,3 @@ export default function Home() {
     </div>
   );
 }
-
