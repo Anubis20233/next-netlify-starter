@@ -97,31 +97,7 @@ export default function Home() {
       setUserPrize('');
       setIsFormVisible(false); // Закриваємо форму
       setHistory(prizeData); // Оновлюємо історію
-
-      // Викликаємо функцію для відправки даних до Google Sheets
-      sendDataToGoogleSheets(userData);
-    } else {
-      alert('Будь ласка, заповніть всі поля!');
     }
-  };
-
-  const sendDataToGoogleSheets = (userData) => {
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbwU7E9DT0iqDhlgAviwVHDJp9owo80okx7Otn7wMGkBXF4cHgm_btgdkLaD6I72FxxhUA/exec"; // Ваш URL скрипта
-
-    // Створюємо запит
-    const payload = {
-      method: "POST",
-      body: JSON.stringify({ data: userData }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    // Виконуємо запит
-    fetch(scriptUrl, payload)
-      .then((response) => response.json())
-      .then((data) => console.log("Дані успішно додано до Google Таблиці:", data))
-      .catch((error) => console.error("Помилка:", error));
   };
 
   return (
@@ -289,6 +265,11 @@ export default function Home() {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
       </div>
     </div>
   );
