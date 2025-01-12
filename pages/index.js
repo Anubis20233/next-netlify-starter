@@ -5,7 +5,7 @@ export default function Home() {
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);  
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userPrize, setUserPrize] = useState('');
@@ -79,31 +79,45 @@ export default function Home() {
   const submitForm = (e) => {
     e.preventDefault();
     if (userName && userEmail && userPrize) {
-      // Simple email validation check
+      // Просте перевірка email
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
       if (!emailPattern.test(userEmail)) {
-        alert('Please enter a valid email address');
+        alert('Будь ласка, введіть дійсну електронну адресу');
         return;
       }
 
-      const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
+      // Створення даних для форми
+      const formData = new FormData();
+      formData.append('entry.210889611', userName); // ID поля "Ім'я"
+      formData.append('entry.2127313793', userEmail); // ID поля "Email"
+      formData.append('entry.249957477', userPrize); // ID поля "Приз"
 
-      // Завантажуємо всі дані з localStorage та додаємо новий запис
-      const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
-      
-      // Перевірка, чи немає вже цього користувача в історії (щоб не записувати повторно)
-      const userExists = prizeData.some((item) => item.email === userEmail);
-      if (!userExists) {
-        prizeData.push(userData); // Додаємо новий запис
-        localStorage.setItem('prizeData', JSON.stringify(prizeData)); // Оновлюємо localStorage
-      }
+      // Ваша URL Google форми
+      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/viewform?usp=header';
 
-      // Оновлюємо стейт та очищуємо форму
-      setUserName('');
-      setUserEmail('');
-      setUserPrize('');
-      setIsFormVisible(false); // Закриваємо форму
-      setHistory(prizeData); // Оновлюємо історію
+      // Відправлення даних до Google форми
+      fetch(formUrl, {
+        method: 'POST',
+        body: formData,
+      })
+        .then(() => {
+          alert('Дякуємо! Ваші дані надіслано.');
+          // Оновлюємо історію виграшів у локальному сховищі
+          const userData = { name: userName, email: userEmail, prize: userPrize, date: new Date().toLocaleString() };
+          const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
+          prizeData.push(userData);
+          localStorage.setItem('prizeData', JSON.stringify(prizeData));
+          setHistory(prizeData); // Оновлюємо історію
+          // Очищаємо форму
+          setUserName('');
+          setUserEmail('');
+          setUserPrize('');
+          setIsFormVisible(false); // Закриваємо форму
+        })
+        .catch((error) => {
+          console.error('Помилка відправки:', error);
+          alert('Сталася помилка при відправці даних.');
+        });
     }
   };
 
@@ -243,36 +257,4 @@ export default function Home() {
 
       {/* Історія виграшів */}
       <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
-        <h3>Історія виграшів</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>Ім'я</th>
-              <th>Email</th>
-              <th>Виграний приз</th>
-              <th>Дата</th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.length === 0 ? (
-              <tr>
-                <td colSpan="4" style={{ textAlign: 'center' }}>
-                  Поки що немає записів.
-                </td>
-              </tr>
-            ) : (
-              history.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.name}</td>
-                  <td>{item.email}</td>
-                  <td>{item.prize}</td>
-                  <td>{item.date}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+        <h3>Істор
