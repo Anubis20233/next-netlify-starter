@@ -32,7 +32,7 @@ export default function Home() {
     const spinHistory = JSON.parse(localStorage.getItem('prizeData')) || [];
     setHistory(spinHistory);
 
-    // Перевіряємо час для наступного обертання
+    // Перевірка часу, коли можна прокручувати колесо
     const lastSpinDate = localStorage.getItem('lastSpinDate');
     if (lastSpinDate) {
       const lastSpin = new Date(lastSpinDate);
@@ -81,11 +81,14 @@ export default function Home() {
     if (userName && userEmail && userPrize) {
       const userData = { name: userName, email: userEmail, prize: userPrize };
 
-      // Отримуємо всі дані з LocalStorage і додаємо новий запис
+      // Отримуємо всі дані з LocalStorage та додаємо новий запис
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
-      prizeData.push(userData);
+      prizeData.push(userData); // Додаємо новий запис в масив
+
+      // Зберігаємо нові дані назад у localStorage
       localStorage.setItem('prizeData', JSON.stringify(prizeData));
 
+      // Оновлюємо стейт та очищуємо форму
       setUserName('');
       setUserEmail('');
       setUserPrize('');
@@ -261,4 +264,3 @@ export default function Home() {
     </div>
   );
 }
-
