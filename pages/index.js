@@ -81,9 +81,9 @@ export default function Home() {
     if (userName && userEmail && userPrize) {
       const userData = { name: userName, email: userEmail, prize: userPrize };
 
-      // Отримуємо всі дані з LocalStorage та додаємо новий запис
+      // Завантажуємо всі дані з localStorage та додаємо новий запис
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
-      prizeData.push(userData); // Додаємо новий запис в масив
+      prizeData.push(userData); // Додаємо новий запис у масив
 
       // Зберігаємо нові дані назад у localStorage
       localStorage.setItem('prizeData', JSON.stringify(prizeData));
