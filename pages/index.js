@@ -29,8 +29,8 @@ export default function Home() {
 
   useEffect(() => {
     // Завантажуємо історію виграшів з localStorage
-    const spinHistory = JSON.parse(localStorage.getItem('prizeData')) || [];
-    setHistory(spinHistory);
+    const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
+    setHistory(prizeData);
 
     // Перевірка часу, коли можна прокручувати колесо
     const lastSpinDate = localStorage.getItem('lastSpinDate');
@@ -83,10 +83,13 @@ export default function Home() {
 
       // Завантажуємо всі дані з localStorage та додаємо новий запис
       const prizeData = JSON.parse(localStorage.getItem('prizeData')) || [];
-      prizeData.push(userData); // Додаємо новий запис у масив
-
-      // Зберігаємо нові дані назад у localStorage
-      localStorage.setItem('prizeData', JSON.stringify(prizeData));
+      
+      // Перевірка, чи немає вже цього користувача в історії (щоб не записувати повторно)
+      const userExists = prizeData.some((item) => item.email === userEmail);
+      if (!userExists) {
+        prizeData.push(userData); // Додаємо новий запис
+        localStorage.setItem('prizeData', JSON.stringify(prizeData)); // Оновлюємо localStorage
+      }
 
       // Оновлюємо стейт та очищуємо форму
       setUserName('');
