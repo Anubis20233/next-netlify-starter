@@ -100,23 +100,28 @@ export default function Home() {
       // Логування для fetch
       console.log('Відправка на URL:', formUrl);
 
+      // Додаємо проксі-сервер
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      
       // Відправка даних на Google Form через fetch
-      fetch(formUrl, {
-  method: 'POST',
-  body: formData,
-  mode: 'no-cors', // Додаємо режим 'no-cors'
-})
-.then(() => {
-  alert('Дякуємо! Ваші дані надіслано.');
-  setUserName('');
-  setUserEmail('');
-  setUserPrize('');
-  setIsFormVisible(false);
-})
-.catch((error) => {
-  console.error('Помилка відправки:', error);
-  alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
-});
+      fetch(proxyUrl + formUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Origin': 'https://kolesofortuni.netlify.app', // Ваш сайт
+        },
+      })
+      .then(() => {
+        alert('Дякуємо! Ваші дані надіслано.');
+        setUserName('');
+        setUserEmail('');
+        setUserPrize('');
+        setIsFormVisible(false);
+      })
+      .catch((error) => {
+        console.error('Помилка відправки:', error);
+        alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
+      });
     } else {
       alert('Будь ласка, заповніть всі поля!');
     }
@@ -209,44 +214,44 @@ export default function Home() {
           >
             <h3>Заповніть форму для отримання призу</h3>
             <form onSubmit={submitForm}>
-               <input
-    type="text"
-    placeholder="Ваше Нік в грі"
-    value={userName}
-    onChange={(e) => setUserName(e.target.value)}
-    required
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <input
-    type="email"
-    placeholder="Ваш емейл"
-    value={userEmail}
-    onChange={(e) => setUserEmail(e.target.value)}
-    required
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <input
-    type="text"
-    placeholder="Виграний приз"
-    value={userPrize}
-    readOnly
-    style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-  />
-  <button
-    type="submit"
-    style={{
-      width: '100%',
-      padding: '10px',
-      backgroundColor: '#4CAF50',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-    }}
-  >
-    Відправити
-  </button>
-</form>
+              <input
+                type="text"
+                placeholder="Ваше Нік в грі"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="email"
+                placeholder="Ваш емейл"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <input
+                type="text"
+                placeholder="Виграний приз"
+                value={userPrize}
+                readOnly
+                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Відправити
+              </button>
+            </form>
             <button
               onClick={() => setIsFormVisible(false)}
               style={{
