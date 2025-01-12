@@ -5,6 +5,9 @@ export default function Home() {
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0); // Додамо стейт для таймера
+  const [isFormVisible, setIsFormVisible] = useState(false); // Стейт для відображення форми
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   // Призи без відсотків
   const prizes = [
@@ -71,6 +74,30 @@ export default function Home() {
     localStorage.setItem('lastSpinDate', new Date().toISOString());
     setPrize(wonPrize);
     setCanSpin(false);
+    setIsFormVisible(true); // Показуємо форму після виграшу
+  };
+
+  // Функція для відправки даних у Google Форму
+  const submitForm = (event) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append('entry.XXXXXX', userName); // Замінити "entry.XXXXXX" на ваше ID поля для імені
+    formData.append('entry.YYYYYY', userEmail); // Замінити "entry.YYYYYY" на ваше ID поля для емейла
+    formData.append('entry.ZZZZZZ', prize); // Замінити "entry.ZZZZZZ" на ваше ID поля для призу
+
+    // Відправка даних на Google Форму
+    fetch('https://docs.google.com/forms/d/e/FORM_ID/formResponse', {
+      method: 'POST',
+      body: formData,
+    }).then(() => {
+      alert('Дякуємо за участь! Ваші дані були відправлені.');
+      setIsFormVisible(false); // Закриваємо форму після відправки
+      setUserName('');
+      setUserEmail('');
+    }).catch((error) => {
+      console.error('Помилка при відправці форми:', error);
+    });
   };
 
   return (
@@ -133,6 +160,30 @@ export default function Home() {
           ))
         )}
       </div>
+
+      {isFormVisible && (
+        <div style={{ marginTop: '30px' }}>
+          <h3>Заповніть форму</h3>
+          <form onSubmit={submitForm}>
+            <input
+              type="text"
+              placeholder="Ваше ім'я"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Ваш емейл"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              required
+            />
+            <button type="submit">Відправити</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
+
