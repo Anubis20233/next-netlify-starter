@@ -93,7 +93,7 @@ export default function Home() {
       formData.append('entry.249957477', userPrize); // ID поля "Приз"
 
       // Ваша URL Google форми
-      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/viewform?usp=header';
+      const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeXoVJUuiSXbR4_5y8L6_FsP4ndMBVa-SxpRkYLWq7In6Jk2Q/formResponse';
 
       // Відправлення даних до Google форми
       fetch(formUrl, {
@@ -257,4 +257,15 @@ export default function Home() {
 
       {/* Історія виграшів */}
       <div id="history" style={{ marginTop: '30px', textAlign: 'left' }}>
-        <h3>Істор
+        <h3>Історія виграшів</h3>
+        <ul>
+          {history.map((entry, index) => (
+            <li key={index}>
+              <strong>{entry.date}</strong>: {entry.prize}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
