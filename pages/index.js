@@ -180,7 +180,7 @@ export default function Home() {
             <form onSubmit={submitForm}>
               <input
                 type="text"
-                placeholder="Ваше ім'я"
+                placeholder="Ваше Нік в грі"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 required
