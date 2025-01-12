@@ -68,7 +68,7 @@ export default function Home() {
     const wonPrize = getPrize();
     const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
     setHistory(newHistory);
-    localStorage.setItem('spinHistory', JSON.stringify(newHistory));
+    localStorage.setItem('prizeData', JSON.stringify(newHistory));  // Оновлюємо дані в локальному сховищі
     localStorage.setItem('lastSpinDate', new Date().toISOString());
     setPrize(wonPrize);
     setCanSpin(false);
@@ -121,6 +121,16 @@ export default function Home() {
     }
   };
 
+  // Функція для форматування таймера
+  const formatTime = (seconds) => {
+    const days = Math.floor(seconds / (24 * 60 * 60));
+    const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+    const minutes = Math.floor((seconds % (60 * 60)) / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${days} днів ${hours} годин ${minutes} хвилин ${remainingSeconds} секунд`;
+  };
+
   return (
     <div style={{ textAlign: 'center', margin: '30px' }}>
       <h1>Крутимо Колесо Фортуни!</h1>
@@ -165,7 +175,7 @@ export default function Home() {
       </button>
       <p id="message" style={{ marginTop: '10px', color: 'red' }}>
         {!canSpin
-          ? `Наступне обертання буде доступне через ${Math.floor(timer / 60)} хвилин ${timer % 60} секунд.`
+          ? `Наступне обертання буде доступне через ${formatTime(timer)}`
           : ''}
       </p>
       <p id="prize" style={{ marginTop: '20px', fontSize: '24px', color: '#f39c12' }}>
