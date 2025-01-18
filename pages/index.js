@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [canSpin, setCanSpin] = useState(true);
+  const [canSpin, setCanSpin] = useState(true);  // Статус доступності прокручування
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
@@ -43,6 +43,7 @@ export default function Home() {
           setTimer((prev) => {
             if (prev <= 1) {
               clearInterval(timerInterval);
+              setCanSpin(true); // Зробити колесо доступним, коли час вичерпано
               return 0;
             }
             return prev - 1;
@@ -74,6 +75,7 @@ export default function Home() {
     setPrize(wonPrize);
     setCanSpin(false);
     setIsNameEntered(true);  // Показуємо поле для введення імені
+    localStorage.setItem('lastSpinDate', new Date().toISOString()); // Оновлюємо дату останнього обертання
   };
 
   const handleNameSubmit = () => {
@@ -156,7 +158,7 @@ export default function Home() {
           <div style={{ marginTop: '20px' }}>
             <input
               type="text"
-              placeholder="Введіть свой нік у грі"
+              placeholder="Введіть своє ім'я"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               style={{ padding: '10px', fontSize: '16px' }}
