@@ -34,16 +34,18 @@ export default function Home() {
       const lastSpin = new Date(lastSpinDate);
       const now = new Date();
       const oneWeek = 7 * 24 * 60 * 60 * 1000; // 7 днів
-      setCanSpin(now - lastSpin >= oneWeek);
 
-      if (now - lastSpin < oneWeek) {
+      if (now - lastSpin >= oneWeek) {
+        setCanSpin(true); // Якщо пройшло більше 7 днів, дозволити прокрутку
+      } else {
+        setCanSpin(false); // Якщо менше 7 днів, не дозволяти прокрутку
         const countdown = Math.ceil((oneWeek - (now - lastSpin)) / 1000);
-        setTimer(countdown);
+        setTimer(countdown); // Встановити час до наступного обертання
         const timerInterval = setInterval(() => {
           setTimer((prev) => {
             if (prev <= 1) {
               clearInterval(timerInterval);
-              setCanSpin(true); // Зробити колесо доступним, коли час вичерпано
+              setCanSpin(true); // Коли час вичерпано, дозволити прокрутку
               return 0;
             }
             return prev - 1;
