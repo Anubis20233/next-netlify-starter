@@ -5,25 +5,24 @@ export default function Home() {
   const [prize, setPrize] = useState('');
   const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
-  const [isFormVisible, setIsFormVisible] = useState(false);  
   const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userPrize, setUserPrize] = useState('');
+  const [isNameEntered, setIsNameEntered] = useState(false);  // Статус введення імені
 
+  // Додано відсотки для кожного призу
   const prizes = [
-    'VIP premium на 2 тижня',
-    'VIP premium на 1 тиждень',
-    'VIP premium на 3 дні',
-    'VIP free на 3 тижня',
-    'Prefix на 7 днів',
-    'Medic на 4 дні',
-    'Повезе у наступний раз',
-    'VIP Fri на 3 тижня',
-    'VIP fri на 2 тижня',
-    'VIP fri на 1 тиждень',
-    'VIP fri на 5 днів',
-    'VIP Fri на 3 дні',
-    'Імунітет на AWP на 3 дні',
+    { name: 'VIP premium на 2 тижня', chance: 10 },
+    { name: 'VIP premium на 1 тиждень', chance: 10 },
+    { name: 'VIP premium на 3 дні', chance: 10 },
+    { name: 'VIP free на 3 тижня', chance: 1 },
+    { name: 'Prefix на 7 днів', chance: 13 },
+    { name: 'Medic на 4 дні', chance: 13 },
+    { name: 'Повезе у наступний раз', chance: 13 },
+    { name: 'VIP Fri на 3 тижня', chance: 13 },
+    { name: 'VIP fri на 2 тижня', chance: 13 },
+    { name: 'VIP fri на 1 тиждень', chance: 13 },
+    { name: 'VIP fri на 5 днів', chance: 13 },
+    { name: 'VIP Fri на 3 дні', chance: 13 },
+    { name: 'Імунітет на AWP на 3 дні', chance: 13 },
   ];
 
   useEffect(() => {
@@ -54,73 +53,42 @@ export default function Home() {
     }
   }, []);
 
-  const getPrize = () => prizes[Math.floor(Math.random() * prizes.length)];
+  // Функція для вибору призу з урахуванням відсотків
+  const getPrize = () => {
+    const totalChance = prizes.reduce((acc, prize) => acc + prize.chance, 0);
+    const randomNumber = Math.random() * totalChance;
+    let accumulatedChance = 0;
+
+    for (let prize of prizes) {
+      accumulatedChance += prize.chance;
+      if (randomNumber <= accumulatedChance) {
+        return prize.name;
+      }
+    }
+  };
 
   const spinWheel = () => {
     if (!canSpin) return;
 
-    const wonPrize = getPrize();
-    const newHistory = [...history, { date: new Date().toLocaleString(), prize: wonPrize }];
-    setHistory(newHistory);
-    localStorage.setItem('prizeData', JSON.stringify(newHistory));
-    localStorage.setItem('lastSpinDate', new Date().toISOString());
+    const wonPrize = getPrize();  // Отримуємо приз на основі ймовірностей
     setPrize(wonPrize);
     setCanSpin(false);
-    setUserPrize(wonPrize);
-    setIsFormVisible(true);
+    setIsNameEntered(true);  // Показуємо поле для введення імені
   };
 
-  const submitForm = (e) => {
-  e.preventDefault(); // Забороняє стандартну поведінку форми
-
-  if (userName && userEmail && userPrize) {
-    // Перевірка на коректність email
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailPattern.test(userEmail)) {
-      alert('Будь ласка, введіть дійсну електронну адресу');
+  const handleNameSubmit = () => {
+    if (userName.trim() === '') {
+      alert('Будь ласка, введіть своє ім\'я');
       return;
     }
 
-    // Логування даних перед відправкою
-    console.log('Дані для відправки:', {
-      name: userName,
-      email: userEmail,
-      prize: userPrize,
-    });
-
-    // Формування об'єкта з даними форми
-    const formData = {
-      entry_210889611: userName, // ID поля "Ім'я"
-      entry_2127313793: userEmail, // ID поля "Email"
-      entry_249957477: userPrize, // ID поля "Приз"
-    };
-
-    const formUrl = 'http://localhost:5000/submit'; // Локальний сервер
-
-    // Відправка даних на сервер за допомогою fetch
-    fetch(formUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData), // Відправка даних
-    })
-      .then((response) => response.json()) // Очікуємо JSON-дані від сервера
-      .then((data) => {
-        alert('Дякуємо! Ваші дані надіслано.');
-        setUserName('');
-        setUserEmail('');
-        setUserPrize('');
-        setIsFormVisible(false);
-      })
-      .catch((error) => {
-        console.error('Помилка відправки:', error);
-        alert('Сталася помилка при відправці даних. Перевірте консоль для деталей.');
-      });
-  } else {
-    alert('Будь ласка, заповніть всі поля!');
-  }
-};
+    // Додаємо ім'я та приз в історію
+    const newHistory = [...history, { date: new Date().toLocaleString(), prize: prize, name: userName }];
+    setHistory(newHistory);
+    localStorage.setItem('prizeData', JSON.stringify(newHistory));
+    setIsNameEntered(false);  // Закриваємо поле для введення імені
+    setUserName('');  // Очищаємо поле для імені
+  };
 
   const formatTime = (seconds) => {
     const days = Math.floor(seconds / (24 * 60 * 60));
@@ -161,7 +129,7 @@ export default function Home() {
               transform: `rotate(${index * 60}deg)`,
             }}
           >
-            {prize}
+            {prize.name}
           </div>
         ))}
       </div>
@@ -182,86 +150,29 @@ export default function Home() {
         {prize ? `Ви виграли: ${prize}` : ''}
       </p>
 
-      {/* Модальне вікно для форми */}
-      {isFormVisible && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <div
+      {/* Якщо приз виграно, з'являється поле для введення імені */}
+      {isNameEntered && (
+        <div style={{ marginTop: '20px' }}>
+          <input
+            type="text"
+            placeholder="Введіть своє ім'я"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            style={{ padding: '10px', fontSize: '16px' }}
+          />
+          <button
+            onClick={handleNameSubmit}
             style={{
-              backgroundColor: '#fff',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '400px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+              padding: '10px 20px',
+              fontSize: '16px',
+              marginLeft: '10px',
+              cursor: 'pointer',
+              backgroundColor: '#4CAF50',
+              color: 'white',
             }}
           >
-            <h3>Заповніть форму для отримання призу</h3>
-            <form onSubmit={submitForm}>
-              <input
-                type="text"
-                placeholder="Ваше Нік в грі"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                required
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <input
-                type="email"
-                placeholder="Ваш емейл"
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                required
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <input
-                type="text"
-                placeholder="Виграний приз"
-                value={userPrize}
-                readOnly
-                style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
-              />
-              <button
-                type="submit"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Відправити
-              </button>
-            </form>
-            <button
-              onClick={() => setIsFormVisible(false)}
-              style={{
-                marginTop: '10px',
-                padding: '10px 20px',
-                backgroundColor: 'red',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Закрити
-            </button>
-          </div>
+            Підтвердити
+          </button>
         </div>
       )}
 
@@ -271,7 +182,7 @@ export default function Home() {
         <ul>
           {history.map((entry, index) => (
             <li key={index}>
-              <strong>{entry.date}</strong>: {entry.prize}
+              <strong>{entry.date}</strong>: {entry.name} виграв(ла) {entry.prize}
             </li>
           ))}
         </ul>
@@ -279,3 +190,4 @@ export default function Home() {
     </div>
   );
 }
+
