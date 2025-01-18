@@ -10,19 +10,19 @@ export default function Home() {
 
   // Додано відсотки для кожного призу
   const prizes = [
-    { name: 'VIP premium на 2 тижня', chance: 10 },
-    { name: 'VIP premium на 1 тиждень', chance: 15 },
-    { name: 'VIP premium на 3 дні', chance: 20 },
-    { name: 'VIP free на 3 тижня', chance: 5 },
-    { name: 'Prefix на 7 днів', chance: 8 },
-    { name: 'Medic на 4 дні', chance: 12 },
-    { name: 'Повезе у наступний раз', chance: 10 },
-    { name: 'VIP Fri на 3 тижня', chance: 5 },
-    { name: 'VIP fri на 2 тижня', chance: 4 },
-    { name: 'VIP fri на 1 тиждень', chance: 3 },
-    { name: 'VIP fri на 5 днів', chance: 3 },
-    { name: 'VIP Fri на 3 дні', chance: 4 },
-    { name: 'Імунітет на AWP на 3 дні', chance: 3 },
+    { name: 'VIP premium на 2 тижня', chance: 12 },
+    { name: 'VIP premium на 1 тиждень', chance: 12 },
+    { name: 'VIP premium на 3 дні', chance: 12 },
+    { name: 'VIP free на 3 тижня', chance: 13 },
+    { name: 'Prefix на 7 днів', chance: 13 },
+    { name: 'Medic на 4 дні', chance: 13 },
+    { name: 'Повезе у наступний раз', chance: 13 },
+    { name: 'VIP Fri на 3 тижня', chance: 13 },
+    { name: 'VIP fri на 2 тижня', chance: 13 },
+    { name: 'VIP fri на 1 тиждень', chance: 13 },
+    { name: 'VIP fri на 5 днів', chance: 13 },
+    { name: 'VIP Fri на 3 дні', chance: 13 },
+    { name: 'Імунітет на AWP на 3 дні', chance: 13 },
   ];
 
   useEffect(() => {
