@@ -78,7 +78,7 @@ export default function Home() {
 
   const handleNameSubmit = () => {
     if (userName.trim() === '') {
-      alert('Будь ласка, введіть своє ім\'я');
+      alert('Будь ласка, введіть свой нік у грі');
       return;
     }
 
