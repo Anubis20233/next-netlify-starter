@@ -20,7 +20,6 @@ export default function Home() {
     'VIP fri на 1 тиждень',
     'VIP fri на 5 днів',
     'VIP Fri на 3 дні',
-    'Імунітет на AWP на 3 дні',
   ];
 
   useEffect(() => {
