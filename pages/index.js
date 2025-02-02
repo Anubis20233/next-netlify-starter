@@ -22,7 +22,7 @@ export default function Home() {
     { name: 'VIP fri на 1 тиждень', chance: 13 },
     { name: 'VIP fri на 5 днів', chance: 13 },
     { name: 'VIP Fri на 3 дні', chance: 13 },
-    { name: 'Імунітет на AWP на 3 дні', chance: 13 },
+
   ];
 
   useEffect(() => {
